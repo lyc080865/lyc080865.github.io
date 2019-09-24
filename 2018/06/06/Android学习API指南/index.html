@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="竹影">
+
+
+
+<meta name="description" content="Android学习API指南，了解就行（从有道云迁移）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android学习API指南">
+<meta property="og:url" content="http://liyuncang.club/2018/06/06/Android学习API指南/index.html">
+<meta property="og:site_name" content="我的博客">
+<meta property="og:description" content="Android学习API指南，了解就行（从有道云迁移）。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-06-06T03:28:25.439Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android学习API指南">
+<meta name="twitter:description" content="Android学习API指南，了解就行（从有道云迁移）。">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="我的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Android学习API指南 | 我的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/my_avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">竹影</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="/12345@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">竹影</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/my_avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">竹影</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="/12345@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Android学习API指南" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/06/06/Android学习API指南/" class="article-date">
+      <time datetime="2018-06-06T03:24:53.000Z" itemprop="datePublished">2018-06-06</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android学习API指南
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>Android学习API指南，了解就行（从有道云迁移）。</p>
+<a id="more"></a>
+<h5 id="Android学习API指南："><a href="#Android学习API指南：" class="headerlink" title="Android学习API指南："></a>Android学习API指南：</h5><ol>
+<li>应用的组成部分   App Components</li>
+<li><ol>
+<li>应用的基本原理    App Fundamentals</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>Activity      Activities</li>
+</ol>
+</li>
+<li>2.1. 片段    Fragments</li>
+<li>2.2. 加载器     Loaders</li>
+<li>2.3. 任务和返回堆    Tasks and Back Stack</li>
+<li><ol start="3">
+<li>Service服务   Services</li>
+</ol>
+</li>
+<li>3.1. 绑定服务     Bound Services</li>
+<li>3.2. AIDL   Android Interface Definition Language </li>
+<li><ol start="4">
+<li>内容提供器    Content Providers</li>
+</ol>
+</li>
+<li>4.1. 内容提供器基础   Content Providers Basics</li>
+<li>4.2. 创建一个内容提供器     Creating a Content Provider</li>
+<li>4.3. 日历提供器    Calendar Provider</li>
+<li>4.4. 通信录提供器   Contact Provider</li>
+<li><ol start="5">
+<li>意图和意图过滤器    Intents and Intents Filters</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>进程和线程    Process and Threads </li>
+</ol>
+</li>
+<li><ol start="7">
+<li>权限系统    Permissions</li>
+</ol>
+</li>
+<li><ol start="8">
+<li>窗口小部件    App Widgets</li>
+</ol>
+</li>
+<li><ol start="9">
+<li>Android清单    Android Manifest</li>
+</ol>
+</li>
+<li>用户界面     User Interface</li>
+<li><ol>
+<li>概述    Overview</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>布局    Layout</li>
+</ol>
+</li>
+<li>2.1. 线形布局    Linear Layout</li>
+<li>2.2. 相对布局    Relative Layout</li>
+<li>2.3. 列表视图    ListView</li>
+<li>2.4. 网格视图    GridView</li>
+<li><ol start="3">
+<li>输入控件   Input Controls</li>
+</ol>
+</li>
+<li>3.1. 按钮    Buttons</li>
+<li>3.2. 文本区域    Text Fields   </li>
+<li>3.3. 复选框    Checkboxes</li>
+<li>3.4. 单选按钮   Radio Buttons</li>
+<li>3.5. 开关按钮   Toggle Buttons</li>
+<li>3.6. 下拉列表   Spinners</li>
+<li>3.7. 选择器    Pickers</li>
+<li><ol start="4">
+<li>输入事件   Input Events</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>菜单   Menus</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>动作条   Action Bar</li>
+</ol>
+</li>
+<li><ol start="7">
+<li>设置     Settings</li>
+</ol>
+</li>
+<li><ol start="8">
+<li>对话框   Dialogs</li>
+</ol>
+</li>
+<li><ol start="9">
+<li>状态通知    Notifications</li>
+</ol>
+</li>
+<li><ol start="10">
+<li>Toast通知   Toasts   </li>
+</ol>
+</li>
+<li><ol start="11">
+<li>搜索   Search</li>
+</ol>
+</li>
+<li>11.1. 创建一个搜索界面    Creating a Search Interface</li>
+<li>11.2. 增加当前搜索提醒  Adding Recent Query Suggestions</li>
+<li>11.3. 增加个性化提醒   Adding Custom Suggestions</li>
+<li>11.4. 搜索配置   Searchable Configuration</li>
+<li><ol start="12">
+<li>拖放操作    Drag and Drop</li>
+</ol>
+</li>
+<li><ol start="13">
+<li>可访问性    Accessibility</li>
+</ol>
+</li>
+<li>13.1. 应用程序的可访问性   Making Applications Accessible</li>
+<li>13.2. 构建可访问性服务   Building Accessibility Services</li>
+<li><ol start="14">
+<li>风格和主题   Styles and Themes</li>
+</ol>
+</li>
+<li><ol start="15">
+<li>自定义控件   Custom Components</li>
+</ol>
+</li>
+<li>应用程序资源   App Resources</li>
+<li><ol>
+<li>概述   Overview</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>提供的资源   Providing Resources</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>对资源的访问   Accessing Resources</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>运行时变化的处理   Handling Runtime Changes</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>本地化   Localization</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>资源类型   Resource Types</li>
+</ol>
+</li>
+<li>6.1. 动画   Animation</li>
+<li>6.2. 状态颜色列表    Color State List</li>
+<li>6.3. 图形处理类资源   Drawable</li>
+<li>6.4. 布局   Layout</li>
+<li>6.5. 菜单   Menu</li>
+<li>6.6. 字符串   String</li>
+<li>6.7. 样式    Style</li>
+<li>6.8. 其他类型   More Types</li>
+<li>动画和图形    Animation  and Graphics</li>
+<li><ol>
+<li>概述   Overview</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>属性动画   Property Animation</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>补间动画   View Animation</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>帧动画    Drawable Animation</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>画布和绘制   Canvas and Drawables</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>OpenGL    OpenGL  ES</li>
+</ol>
+</li>
+<li><ol start="7">
+<li>硬件加速   Hardware Acceleration</li>
+</ol>
+</li>
+<li>高性能计算   Computation</li>
+<li><ol>
+<li>RenderScript编程   RenderScript </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>RenderScript编程进阶    Advanced RenderScript</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>运行时API说明    Runtime API Reference</li>
+</ol>
+</li>
+<li>多媒体和照相机     Media and Camera</li>
+<li><ol>
+<li>媒体播放    Media Playback</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>支持的媒体格式    Supported Media Formats</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>音频捕获    Audio Capture</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>JET引擎    JetPlayer</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>照相机      Camera</li>
+</ol>
+</li>
+<li>定位和传感器    Location and Sensors</li>
+<li><ol>
+<li>定位和地图    Location and Maps</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>定位策略    Location Strategies</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>传感器概述    Sensors Overview</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>手势传感器    Motion Sensors</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>位置传感器    Position Sensors</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>环境传感器    Environment Sensors</li>
+</ol>
+</li>
+<li>通信   Connectivity</li>
+<li><ol>
+<li>蓝牙   Bluetooth</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>NFC通信   NFC</li>
+</ol>
+</li>
+<li>2.1. NFC基础   NFC Basics</li>
+<li>2.2. NFC进阶   Advanced NFC</li>
+<li><ol start="3">
+<li>Wi-FI直连  Wi-Fi 2P</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>USB通信  USB</li>
+</ol>
+</li>
+<li>4.1. 附件模式 Accessory</li>
+<li>4.2. 主机模式  Host</li>
+<li><ol start="5">
+<li>SIP协议   SIP</li>
+</ol>
+</li>
+<li>文本输入法   Text and Input</li>
+<li><ol>
+<li>复制和粘贴    Copy and Input</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>创建一个输入法    Creating an IME</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>拼写检查器    Spelling Checker</li>
+</ol>
+</li>
+<li>数据存储   Data Storage</li>
+<li><ol>
+<li>存储选项   Storage Options</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>数据备份   Data Backup</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>应用程序安装位置   App install Locaiton</li>
+</ol>
+</li>
+<li>系统管理员   Administration</li>
+<li><ol>
+<li>硬件管理   Device  Policies</li>
+</ol>
+</li>
+<li>web应用   Web Apps</li>
+<li><ol>
+<li>概述    Overview</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>web应用的屏幕适配   Targeting Screens from Web Apps</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>利用webview构建web应用   Building Web Apps in WebView</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>调试web应用   Debugging Web Apps</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>web应用的优化   Best Practices for Web Apps </li>
+</ol>
+</li>
+<li>更好的策略</li>
+<li><ol>
+<li>一致性（兼容性）  Compatibility</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>支持多屏幕   Supporting Multiple Screens</li>
+</ol>
+</li>
+<li>2.1. 适配指定屏幕    Distributing to Specific Screens</li>
+<li>2.2. 屏幕兼容模式    Screen Compatibility Mode</li>
+<li><ol start="3">
+<li>支持平板和手机   Supporting Tablets and Handsets</li>
+</ol>
+</li>
+<li>Google提供的服务  Google Services </li>
+<li><ol>
+<li>应用程序内部付费机制</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>应用程序内部付费机制概述 </li>
+</ol>
+</li>
+<li><ol start="3">
+<li>如何使用应用程序付费服务 </li>
+</ol>
+</li>
+<li><ol start="4">
+<li>订阅机制 </li>
+</ol>
+</li>
+<li><ol start="5">
+<li>安全与设计 </li>
+</ol>
+</li>
+<li><ol start="6">
+<li>测试应用程序付费服务 </li>
+</ol>
+</li>
+<li><ol start="7">
+<li>应用程序付费机制的管理 </li>
+</ol>
+</li>
+<li><ol start="8">
+<li>应用程序付费的相关API </li>
+</ol>
+</li>
+<li><ol start="9">
+<li>应用程序许可机制</li>
+</ol>
+</li>
+<li><ol start="10">
+<li>许可机制概述 </li>
+</ol>
+</li>
+<li><ol start="11">
+<li>设置许可机制 </li>
+</ol>
+</li>
+<li><ol start="12">
+<li>在应用中增加许可 </li>
+</ol>
+</li>
+<li><ol start="13">
+<li>许可机制API </li>
+</ol>
+</li>
+<li><ol start="14">
+<li>Google软件商店服务 </li>
+</ol>
+</li>
+<li><ol start="15">
+<li>在Google Play中加过滤器 </li>
+</ol>
+</li>
+<li><ol start="16">
+<li>多APK支持 </li>
+</ol>
+</li>
+<li><ol start="17">
+<li>对APK附加文件的服务 </li>
+</ol>
+</li>
+<li><ol start="18">
+<li>Google云消息服务</li>
+</ol>
+</li>
+<li><ol start="19">
+<li>如何使用google云服务 </li>
+</ol>
+</li>
+<li><ol start="20">
+<li>架构概述 </li>
+</ol>
+</li>
+<li><ol start="21">
+<li>演示教程 </li>
+</ol>
+</li>
+<li><ol start="22">
+<li>Google云服务进阶 </li>
+</ol>
+</li>
+<li><ol start="23">
+<li>信息迁移 </li>
+</ol>
+</li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/06/06/Android学习API指南/">Android学习API指南</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">竹影</a></p>
+        <p><span>发布时间:</span>2018-06-06, 11:24:53</p>
+        <p><span>最后更新:</span>2018-06-06, 11:28:25</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/06/06/Android学习API指南/" title="Android学习API指南">http://liyuncang.club/2018/06/06/Android学习API指南/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://liyuncang.club/2018/06/06/Android学习API指南/　　作者: 竹影" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2018/06/06/Android-四大组件/">
+                    Android 四大组件
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/06/06/Android的四层体系架构/">
+                    Android的四层体系架构
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#Android学习API指南："><span class="toc-number">1.</span> <span class="toc-text">Android学习API指南：</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Android学习API指南　| 我的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/06/06/Android-四大组件/" title="上一篇: Android 四大组件">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/06/06/Android的四层体系架构/" title="下一篇: Android的四层体系架构">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/09/18/GestureDetector/">GestureDetector</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/14/Rxjava2-操作符/">Rxjava2 操作符</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/12/Rxjava-源码分析/">Rxjava 源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/12/Rxjava/">Rxjava2.x的基本概念和使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/EventBus3-0源码解析/">EventBus3.0源码解析</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/13/EventBus框架/">EventBus框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/03/单元测试（四）：Robolectric/">单元测试（四）：Robolectric</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/28/单元测试（三）：PowerMock的使用/">单元测试（三）：PowerMock的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/26/单元测试（二）：Mockito的使用/">单元测试（二）：Mockito的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/14/单元测试（一）-：JUnit框架的使用/">单元测试（一）-：JUnit4框架的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/14/FlowLayout/">FlowLayout</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/13/Androdi-build-gradle文件/"> Androdi build.gradle文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/13/AndroidStudio-添加C和C-代码/">AndroidStudio 添加C和C++代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/11/Property-Animation-属性动画高级用法/">Property Animation 属性动画高级用法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/11/Animation-基本使用/">Animation 基本使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/08/java-基本算法/">java 常用排序算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/FileProvider/">FileProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/夜间模式/">夜间模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/Android-跑马灯效果/">Android 跑马灯效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/Android子线程不能更新UI的原因/">Android子线程不能更新UI的原因</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android-四大组件/">Android 四大组件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android学习API指南/">Android学习API指南</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android的四层体系架构/">Android的四层体系架构</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/Http状态码/">Http状态码</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/贝塞尔曲线/">贝塞尔曲线</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/git命令/">git命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Git/">Git 基本使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Hexo-常用命令/">Hexo</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Hexo-Github-博客/">Hexo+Github 搭建博客</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/30/Markdown-基本语法/">Markdown 基本语法</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2019 竹影
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

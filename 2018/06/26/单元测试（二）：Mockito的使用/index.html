@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="竹影">
+
+
+
+<meta name="description" content="在实际项目中写单元测试中,我们会发现需要测试的类之间有很多依赖，导致在单元测试代码里几乎无法完成构建，尤其是当依赖项尚未构建完成时会导致单元测试无法进行,为了解决这些问题，我们可以使用Mock框架——Mockito。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单元测试（二）：Mockito的使用">
+<meta property="og:url" content="http://liyuncang.club/2018/06/26/单元测试（二）：Mockito的使用/index.html">
+<meta property="og:site_name" content="我的博客">
+<meta property="og:description" content="在实际项目中写单元测试中,我们会发现需要测试的类之间有很多依赖，导致在单元测试代码里几乎无法完成构建，尤其是当依赖项尚未构建完成时会导致单元测试无法进行,为了解决这些问题，我们可以使用Mock框架——Mockito。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://liyuncang.club/images/test/mockito_01.png">
+<meta property="og:updated_time" content="2018-07-03T02:44:13.341Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="单元测试（二）：Mockito的使用">
+<meta name="twitter:description" content="在实际项目中写单元测试中,我们会发现需要测试的类之间有很多依赖，导致在单元测试代码里几乎无法完成构建，尤其是当依赖项尚未构建完成时会导致单元测试无法进行,为了解决这些问题，我们可以使用Mock框架——Mockito。">
+<meta name="twitter:image" content="http://liyuncang.club/images/test/mockito_01.png">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="我的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>单元测试（二）：Mockito的使用 | 我的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/my_avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">竹影</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="/12345@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">竹影</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/my_avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">竹影</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="/12345@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-单元测试（二）：Mockito的使用" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/06/26/单元测试（二）：Mockito的使用/" class="article-date">
+      <time datetime="2018-06-26T06:07:36.000Z" itemprop="datePublished">2018-06-26</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      单元测试（二）：Mockito的使用
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>在实际项目中写单元测试中,我们会发现需要测试的类之间有很多依赖，导致在单元测试代码里几乎无法完成构建，尤其是当依赖项尚未构建完成时会导致单元测试无法进行,为了解决这些问题，我们可以使用Mock框架——Mockito。</p>
+<a id="more"></a>
+
+<p>Mockito在Github的开源地址 <a href="https://github.com/mockito/mockito" target="_blank" rel="noopener">https://github.com/mockito/mockito</a><br>Mockito官方文档 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html" target="_blank" rel="noopener">https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html</a><br>Mockito中文文档 <a href="https://github.com/hehonghui/mockito-doc-zh" target="_blank" rel="noopener">https://github.com/hehonghui/mockito-doc-zh</a><br>参考文章：<a href="https://blog.csdn.net/qq_17766199/article/details/78450007" target="_blank" rel="noopener">https://blog.csdn.net/qq_17766199/article/details/78450007</a></p>
+<h4 id="什么是Mock"><a href="#什么是Mock" class="headerlink" title="什么是Mock"></a>什么是Mock</h4><p>mock:通常理解为模拟对象。<br>mock的目的与作用：模拟一些在应用中不容易构造或者比较复杂的对象，从而把测试与测试边界以外的对象隔离开。<br>而Mockito就是一个优秀的用于单元测试的mock框架。 但Mockito不支持静态函数、构造函数、私有函数、Final 函数以及系统函数的模拟</p>
+<h4 id="Android中引用"><a href="#Android中引用" class="headerlink" title="Android中引用"></a>Android中引用</h4><p>在build文件中添加依赖：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">testImplementation &apos;org.mockito:mockito-core:2.19.0&apos;</span><br></pre></td></tr></table></figure>
+
+<h4 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h4><h5 id="Mock方式"><a href="#Mock方式" class="headerlink" title="Mock方式"></a>Mock方式</h5><p>普通方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class MockitoTest &#123;</span><br><span class="line">    @Test</span><br><span class="line">    public void testIsNotNull()&#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line"></span><br><span class="line">        assertNotNull(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import org.junit.Before;</span><br><span class="line">import org.junit.Test;</span><br><span class="line">import org.mockito.Mock;</span><br><span class="line">import org.mockito.MockitoAnnotations;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">import static org.junit.Assert.assertNotNull;</span><br><span class="line"></span><br><span class="line">public class MockitoAnnotationsTest &#123;</span><br><span class="line">    @Mock</span><br><span class="line">    List list;</span><br><span class="line"></span><br><span class="line">    @Before</span><br><span class="line">    public void setUp() &#123;</span><br><span class="line">        MockitoAnnotations.initMocks(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void testIsNotNull() &#123;</span><br><span class="line">        assertNotNull(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行器方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@RunWith(MockitoJUnitRunner.class)</span><br><span class="line">public class MockitoJUnitRunnerTest &#123;</span><br><span class="line">    @Mock</span><br><span class="line">    List list;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void testIsNotNull()&#123;</span><br><span class="line">        assertNotNull(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>MockitoRule方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class MockitoRuleTest &#123;</span><br><span class="line">    @Mock</span><br><span class="line">    List list;</span><br><span class="line"></span><br><span class="line">    @Rule</span><br><span class="line">    public MockitoRule mockitoRule = MockitoJUnit.rule();</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void testIsNotNull() &#123;</span><br><span class="line">        assertNotNull(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="常用打桩方法-Stub"><a href="#常用打桩方法-Stub" class="headerlink" title="常用打桩方法 Stub"></a>常用打桩方法 Stub</h5><p>因为Mock出的对象中非void方法都将返回默认值，比如int方法将返回0，对象方法将返回null等，而void方法将什么都不做。“打桩”顾名思义就是将我们Mock出的对象进行操作，比如提供模拟的返回值等，给Mock打基础。</p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>方法描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>thenReturn(T value)</td>
+<td>设置要返回的值</td>
+</tr>
+<tr>
+<td>thenThrow(Throwable… throwables)</td>
+<td>设置要抛出的异常</td>
+</tr>
+<tr>
+<td>thenAnswer(Answer&lt;?&gt; answer)</td>
+<td>对结果进行拦截</td>
+</tr>
+<tr>
+<td>doReturn(Object toBeReturned)</td>
+<td>提前设置要返回的值</td>
+</tr>
+<tr>
+<td>doThrow(Throwable… toBeThrown)</td>
+<td>提前设置要抛出的异常</td>
+</tr>
+<tr>
+<td>doAnswer(Answer answer)</td>
+<td>提前对结果进行拦截</td>
+</tr>
+<tr>
+<td>doCallRealMethod()</td>
+<td>调用某一个方法的真实实现</td>
+</tr>
+<tr>
+<td>doNothing()</td>
+<td>设置void方法什么也不做</td>
+</tr>
+</tbody></table>
+<p><strong>当使用监控（spy）对象时，不能使用when（Object）,应考虑doReturn|Answer|Throw()函数族来进行打桩</strong><br>简单示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import org.junit.Test;</span><br><span class="line">import org.mockito.invocation.InvocationOnMock;</span><br><span class="line">import org.mockito.stubbing.Answer;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">import static org.mockito.Mockito.doAnswer;</span><br><span class="line">import static org.mockito.Mockito.doNothing;</span><br><span class="line">import static org.mockito.Mockito.doReturn;</span><br><span class="line">import static org.mockito.Mockito.doThrow;</span><br><span class="line">import static org.mockito.Mockito.mock;</span><br><span class="line">import static org.mockito.Mockito.when;</span><br><span class="line"></span><br><span class="line">public class MockStubTest &#123;</span><br><span class="line">    @Test</span><br><span class="line">    public void thenReturnTest() &#123;</span><br><span class="line">        List list = mock(List.class); //&lt;--使用mock方法</span><br><span class="line">        when(list.get(0)).thenReturn(&quot;first \n&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void thenThrowTest() &#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        when(list.get(0)).thenThrow(new RuntimeException());</span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void thenAnswerTest() &#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line"></span><br><span class="line">        when(list.get(0)).thenAnswer(new Answer&lt;Object&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public Object answer(InvocationOnMock invocation) throws Throwable &#123;</span><br><span class="line">                int argument = invocation.getArgument(0);</span><br><span class="line">                return &quot;argument = &quot; + argument;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        //输出：argument = 0</span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doReturnTest() &#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        doReturn(&quot;first \n&quot;).when(list).get(0);</span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doThrowTest() &#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        doThrow(new RuntimeException()).when(list).clear();</span><br><span class="line">        list.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doAnswerTest()&#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        doAnswer(new Answer() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public Object answer(InvocationOnMock invocation) throws Throwable &#123;</span><br><span class="line">                int argument = invocation.getArgument(0);</span><br><span class="line">                return &quot;argument = &quot; + argument;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).when(list).get(0);</span><br><span class="line">        //输出：argument = 0</span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doCallRealMethodTest()&#123;</span><br><span class="line">        List list = mock(ArrayList.class);</span><br><span class="line">        when(list.get(0)).thenReturn(&quot;first&quot;).thenCallRealMethod();</span><br><span class="line"></span><br><span class="line">        System.out.print(list.get(0));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doNothingTest()&#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        doNothing().doThrow(new RuntimeException()).when(list).clear();</span><br><span class="line">        //第一次才能都没做</span><br><span class="line">        list.clear();</span><br><span class="line">        //下一下次抛出RuntimeException</span><br><span class="line">        list.clear();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="常用验证方法"><a href="#常用验证方法" class="headerlink" title="常用验证方法"></a>常用验证方法</h5><blockquote>
+<p>前面所说的都是状态测试，但是如果不关心返回结果，而是关心方法有否被正确的参数调用过，这时候就应该使用验证方法了。从概念上讲，就是和状态测试所不同的“行为测试”了。</p>
+</blockquote>
+<p>verify(T mock)： 验证发生的某些行为</p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>方法描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>after(long millis)</td>
+<td>在给定的时间后进行验证方法是否执行，不关心方法的执行时间</td>
+</tr>
+<tr>
+<td>timeout(long millis)</td>
+<td>超时时间以内验证方法是否已执行，验证通过则会快速停止，不关心方法的执行时间</td>
+</tr>
+<tr>
+<td>atLeast(int minNumberOfInvocations)</td>
+<td>至少进行n次验证</td>
+</tr>
+<tr>
+<td>atMost(int maxNumberOfInvocations)</td>
+<td>至多进行n次验证</td>
+</tr>
+<tr>
+<td>description(String description)</td>
+<td>自定义验证失败时的输出内容</td>
+</tr>
+<tr>
+<td>times(int wantedNumberOfInvocations)</td>
+<td>验证调用方法的次数</td>
+</tr>
+<tr>
+<td>never()</td>
+<td>验证交互没有发生,相当于times(0)</td>
+</tr>
+<tr>
+<td>only()</td>
+<td>验证方法只被调用一次，相当于times(1)</td>
+</tr>
+<tr>
+<td>atLeastOnce</td>
+<td>至少进行一次验证</td>
+</tr>
+</tbody></table>
+<p>简单示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc;</span><br><span class="line"></span><br><span class="line">public class Time &#123;</span><br><span class="line">    private String time;</span><br><span class="line"></span><br><span class="line">    public String getTime() &#123;</span><br><span class="line">        return time;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setTime(String time) &#123;</span><br><span class="line">        this.time = time;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void timeSleep() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(2000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import com.testing.lyc.Time;</span><br><span class="line"></span><br><span class="line">import org.junit.Before;</span><br><span class="line">import org.junit.Test;</span><br><span class="line"></span><br><span class="line">import static org.mockito.Mockito.after;</span><br><span class="line">import static org.mockito.Mockito.atLeast;</span><br><span class="line">import static org.mockito.Mockito.atLeastOnce;</span><br><span class="line">import static org.mockito.Mockito.atMost;</span><br><span class="line">import static org.mockito.Mockito.description;</span><br><span class="line">import static org.mockito.Mockito.mock;</span><br><span class="line">import static org.mockito.Mockito.never;</span><br><span class="line">import static org.mockito.Mockito.only;</span><br><span class="line">import static org.mockito.Mockito.timeout;</span><br><span class="line">import static org.mockito.Mockito.times;</span><br><span class="line">import static org.mockito.Mockito.verify;</span><br><span class="line">import static org.mockito.Mockito.when;</span><br><span class="line"></span><br><span class="line">public class MocktMethodTest &#123;</span><br><span class="line">    Time time;</span><br><span class="line"></span><br><span class="line">    Runnable runnable = new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                Thread.sleep(2000);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            time.timeSleep();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    @Before</span><br><span class="line">    public void setUp() &#123;</span><br><span class="line">        time = mock(Time.class);</span><br><span class="line">        when(time.getTime()).thenReturn(&quot;2018/6/27 \n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void afterTest() &#123;</span><br><span class="line">        System.out.print(System.currentTimeMillis() + &quot;\n&quot;);</span><br><span class="line">        new Thread(runnable).start();</span><br><span class="line">        verify(time, after(3000)).timeSleep();</span><br><span class="line">        System.out.print(System.currentTimeMillis());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void timeoutTestSuccess() &#123;</span><br><span class="line">        new Thread(runnable).start();</span><br><span class="line">        verify(time, timeout(3000)).timeSleep();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void timeoutTestFailure() &#123;</span><br><span class="line">        new Thread(runnable).start();</span><br><span class="line">        verify(time, timeout(1000)).timeSleep();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void atLeastTest() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        //最少验证两次</span><br><span class="line">        verify(time, atLeast(2)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void atMostTest() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        //最多验证两次</span><br><span class="line">        verify(time, atMost(2)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void descriptionTest() &#123;</span><br><span class="line">        verify(time, description(&quot;get time not invoking&quot;)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void timesTest() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        verify(time, times(2)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void neverTest() &#123;</span><br><span class="line">        verify(time, never()).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void onlyTest() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        verify(time, only()).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void atLeastOnceTest() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        verify(time, atLeastOnce()).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /******** 组合使用 ***********/</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void timeoutAndTimes() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        verify(time, timeout(100).times(2)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void timeoutAndAtMost() &#123;</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        System.out.print(time.getTime());</span><br><span class="line">        verify(time, timeout(100).atLeast(3)).getTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="常用参数匹配器"><a href="#常用参数匹配器" class="headerlink" title="常用参数匹配器"></a>常用参数匹配器</h5><table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>方法描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>anyObject()</td>
+<td>匹配任何对象</td>
+</tr>
+<tr>
+<td>any(Class<t> type)</t></td>
+<td>与anyObject()一样</td>
+</tr>
+<tr>
+<td>any()</td>
+<td>与anyObject()一样</td>
+</tr>
+<tr>
+<td>anyBoolean()</td>
+<td>匹配任何boolean和非空Boolean</td>
+</tr>
+<tr>
+<td>anyByte()</td>
+<td>匹配任何byte和非空Byte</td>
+</tr>
+<tr>
+<td>anyCollection()</td>
+<td>匹配任何非空Collection</td>
+</tr>
+<tr>
+<td>anyDouble()</td>
+<td>匹配任何double和非空Double</td>
+</tr>
+<tr>
+<td>anyFloat()</td>
+<td>匹配任何float和非空Float</td>
+</tr>
+<tr>
+<td>anyInt()</td>
+<td>匹配任何int和非空Integer</td>
+</tr>
+<tr>
+<td>anyList()</td>
+<td>匹配任何非空List</td>
+</tr>
+<tr>
+<td>anyLong()</td>
+<td>匹配任何long和非空Long</td>
+</tr>
+<tr>
+<td>anyMap()</td>
+<td>匹配任何非空Map</td>
+</tr>
+<tr>
+<td>anyString()</td>
+<td>匹配任何非空String</td>
+</tr>
+<tr>
+<td>contains(String substring)</td>
+<td>参数包含给定的substring字符串</td>
+</tr>
+<tr>
+<td>argThat(ArgumentMatcher <t> matcher)</t></td>
+<td>创建自定义的参数匹配模式</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import com.testing.lyc.Time;</span><br><span class="line"></span><br><span class="line">import org.junit.Ignore;</span><br><span class="line">import org.junit.Test;</span><br><span class="line">import org.mockito.ArgumentMatcher;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">import static org.mockito.ArgumentMatchers.anyInt;</span><br><span class="line">import static org.mockito.ArgumentMatchers.argThat;</span><br><span class="line">import static org.mockito.Mockito.mock;</span><br><span class="line">import static org.mockito.Mockito.when;</span><br><span class="line"></span><br><span class="line">public class MatchersTest &#123;</span><br><span class="line"></span><br><span class="line">    @Ignore</span><br><span class="line">    @Test</span><br><span class="line">    public void anyIntTest() &#123;</span><br><span class="line">        List list = mock(List.class);</span><br><span class="line">        when(list.get(anyInt())).thenReturn(&quot;element \n&quot;);</span><br><span class="line">        System.out.print(list.get(999));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void argThatTest() &#123;</span><br><span class="line">        Time time = mock(Time.class);</span><br><span class="line"></span><br><span class="line">        when(time.getString(argThat(new ArgumentMatcher&lt;String&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public boolean matches(String argument) &#123;</span><br><span class="line">                return argument.length() % 2 == 0;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;))).thenReturn(&quot;hello&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.print(time.getString(&quot;asdf&quot;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h5><table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>方法描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>reset(T … mocks)</td>
+<td>重置Mock</td>
+</tr>
+<tr>
+<td>spy(Class<t> classToSpy)</t></td>
+<td>为真实对象创建一个监控(spy)对象</td>
+</tr>
+<tr>
+<td>inOrder(Object… mocks)</td>
+<td>验证执行顺序</td>
+</tr>
+</tbody></table>
+<h6 id="重置mocks对象-reset"><a href="#重置mocks对象-reset" class="headerlink" title="重置mocks对象 reset"></a>重置mocks对象 reset</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import org.junit.Test;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">import static org.mockito.Mockito.mock;</span><br><span class="line">import static org.mockito.Mockito.reset;</span><br><span class="line">import static org.mockito.Mockito.when;</span><br><span class="line"></span><br><span class="line">public class ResetTest &#123;</span><br><span class="line">    @Test</span><br><span class="line">    public void resetTest() &#123;</span><br><span class="line">        List mock = mock(List.class);</span><br><span class="line">        when(mock.size()).thenReturn(10);</span><br><span class="line"></span><br><span class="line">        System.out.print(mock.size() + &quot;\n&quot;);</span><br><span class="line">        reset(mock);</span><br><span class="line">        //at this point the mock forgot any interactions &amp; stubbing</span><br><span class="line">        System.out.print(mock.size() + &quot;\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="监控真实对象spy"><a href="#监控真实对象spy" class="headerlink" title="监控真实对象spy"></a>监控真实对象spy</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package com.testing.lyc.mockito;</span><br><span class="line"></span><br><span class="line">import org.junit.Test;</span><br><span class="line"></span><br><span class="line">import java.util.LinkedList;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">import static org.mockito.Mockito.doReturn;</span><br><span class="line">import static org.mockito.Mockito.spy;</span><br><span class="line">import static org.mockito.Mockito.when;</span><br><span class="line"></span><br><span class="line">public class SpyTest &#123;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void test() &#123;</span><br><span class="line">        List list = new LinkedList();</span><br><span class="line">        List spy = spy(list);</span><br><span class="line"></span><br><span class="line">        spy.add(&quot;one \n&quot;);</span><br><span class="line">        System.out.print(spy.get(0));</span><br><span class="line"></span><br><span class="line">        //IndexOutOfBoundsException spy.get(10)会调用真实函数的get(10)</span><br><span class="line">        //when(spy.get(10)).thenReturn(&quot;ten&quot;);</span><br><span class="line">        //应该这样使用</span><br><span class="line">        doReturn(&quot;ten&quot;).when(spy).get(10);</span><br><span class="line">        System.out.print(spy.get(10));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mockito并不会为真实对象代理函数调用，实际上它会拷贝真实对象。因此如果你保留了真实对象并且与之交互，不要期望从监控对象得到正确的结果。当你在监控对象上调用一个没有被stub的函数时并不会调用真实对象的对应函数，你不会在真实对象上看到任何效果。</p>
+<h6 id="验证方法执行顺序"><a href="#验证方法执行顺序" class="headerlink" title="验证方法执行顺序"></a>验证方法执行顺序</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">// A. Single mock whose methods must be invoked in a particular order</span><br><span class="line">// A. 验证mock一个对象的函数执行顺序</span><br><span class="line">List singleMock = mock(List.class);</span><br><span class="line"></span><br><span class="line">//using a single mock</span><br><span class="line">singleMock.add(&quot;was added first&quot;);</span><br><span class="line">singleMock.add(&quot;was added second&quot;);</span><br><span class="line"></span><br><span class="line">//create an inOrder verifier for a single mock</span><br><span class="line">// 为该mock对象创建一个inOrder对象</span><br><span class="line">InOrder inOrder = inOrder(singleMock);</span><br><span class="line"></span><br><span class="line">//following will make sure that add is first called with &quot;was added first, then with &quot;was added second&quot;</span><br><span class="line">// 确保add函数首先执行的是add(&quot;was added first&quot;),然后才是add(&quot;was added second&quot;)</span><br><span class="line">inOrder.verify(singleMock).add(&quot;was added first&quot;);</span><br><span class="line">inOrder.verify(singleMock).add(&quot;was added second&quot;);</span><br><span class="line"></span><br><span class="line">// B. Multiple mocks that must be used in a particular order</span><br><span class="line">// B .验证多个mock对象的函数执行顺序</span><br><span class="line">List firstMock = mock(List.class);</span><br><span class="line">List secondMock = mock(List.class);</span><br><span class="line"></span><br><span class="line">//using mocks</span><br><span class="line">firstMock.add(&quot;was called first&quot;);</span><br><span class="line">secondMock.add(&quot;was called second&quot;);</span><br><span class="line"></span><br><span class="line">//create inOrder object passing any mocks that need to be verified in order</span><br><span class="line">// 为这两个Mock对象创建inOrder对象</span><br><span class="line">InOrder inOrder = inOrder(firstMock, secondMock);</span><br><span class="line"></span><br><span class="line">//following will make sure that firstMock was called before secondMock</span><br><span class="line">// 验证它们的执行顺序</span><br><span class="line">inOrder.verify(firstMock).add(&quot;was called first&quot;);</span><br><span class="line">inOrder.verify(secondMock).add(&quot;was called second&quot;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h4><p><strong>内容很多很多，暂时记录过来，有时间或者使用的时候再看吧。最好还是去<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html" target="_blank" rel="noopener">官网</a>，上面中文翻译文档还是有点小问题</strong></p>
+<h5 id="验证某些行为-verify"><a href="#验证某些行为-verify" class="headerlink" title="验证某些行为 verify"></a>验证某些行为 verify</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List mockedList = mock(List.class);</span><br><span class="line">mockedList.add(&quot;one&quot;);</span><br><span class="line">mockedList.clear();</span><br><span class="line"></span><br><span class="line">verify(mockedList).add(&quot;one&quot;);</span><br><span class="line">verify(mockedList).clear();</span><br></pre></td></tr></table></figure>
+
+<p>上述代码最后两行表示验证 add(“one”)和 clear()方法是否调用过（只一次，否则异常），因为我们上面确实调用了所以不会报错误，否则会抛出异常，例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//mockedList.clear();</span><br></pre></td></tr></table></figure>
+
+<p>则会报如下的错误：<br><img src="/images/test/mockito_01.png" width="400" height="300"></p>
+<p>一旦mock对象被创建了，mock对象会记住所有的交互。然后你就可能选择性的验证你感兴趣的交互。</p>
+<h5 id="如何做一些测试桩-Stub"><a href="#如何做一些测试桩-Stub" class="headerlink" title="如何做一些测试桩 (Stub)"></a>如何做一些测试桩 (Stub)</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">// 你可以mock具体的类型,不仅只是接口</span><br><span class="line">LinkedList mockedList = mock(LinkedList.class);</span><br><span class="line"></span><br><span class="line">// 测试桩</span><br><span class="line">when(mockedList.get(0)).thenReturn(&quot;first&quot;);</span><br><span class="line">when(mockedList.get(1)).thenThrow(new RuntimeException());</span><br><span class="line"></span><br><span class="line">// 输出“first”</span><br><span class="line">System.out.println(mockedList.get(0));</span><br><span class="line"></span><br><span class="line">// 抛出RuntimeException异常</span><br><span class="line">System.out.println(mockedList.get(1));</span><br><span class="line"></span><br><span class="line">// 因为get(999) 没有打桩，因此输出null</span><br><span class="line">System.out.println(mockedList.get(999));</span><br><span class="line"></span><br><span class="line">//Although it is possible to verify a stubbed invocation, usually it&apos;s just redundant</span><br><span class="line">//If your code cares what get(0) returns then something else breaks (often before even verify() gets executed).（没懂）</span><br><span class="line">//If your code doesn&apos;t care what get(0) returns then it should not be stubbed. Not convinced? See here.</span><br><span class="line">// 验证get(0)被调用的次数</span><br><span class="line">verify(mockedList).get(0);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>默认情况下，所有的函数都有返回值。mock函数默认返回的是null，一个空的集合或者一个被对象类型包装的内置类型，例如0、false对应的对象类型为Integer、Boolean；</li>
+<li>测试桩函数可以被覆写 : 例如常见的测试桩函数可以用于初始化夹具，但是测试函数能够覆写它。请注意，覆写测试桩函数是一种可能存在潜在问题的做法；</li>
+<li>一旦测试桩函数被调用，该函数将会一致返回固定的值；</li>
+<li>上一次调用测试桩函数有时候极为重要-当你调用一个函数很多次时，最后一次调用可能是你所感兴趣的。</li>
+</ul>
+<h5 id="参数匹配器-matchers"><a href="#参数匹配器-matchers" class="headerlink" title="参数匹配器 (matchers)"></a>参数匹配器 (matchers)</h5><p>Mockito以自然的java风格来验证参数值: 使用equals()函数。有时，当需要额外的灵活性时你可能需要使用参数匹配器，也就是argument matchers :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">//stubbing using built-in anyInt() argument matcher</span><br><span class="line"> // 使用内置的anyInt()参数匹配器</span><br><span class="line"> when(mockedList.get(anyInt())).thenReturn(&quot;element&quot;);</span><br><span class="line"></span><br><span class="line"> //stubbing using custom matcher (let&apos;s say isValid() returns your own matcher implementation):</span><br><span class="line"> // 使用自定义的参数匹配器( 在isValid()函数中返回你自己的匹配器实现 )</span><br><span class="line"> when(mockedList.contains(argThat(isValid()))).thenReturn(&quot;element&quot;);</span><br><span class="line"></span><br><span class="line"> //following prints &quot;element&quot;</span><br><span class="line"> // 输出element</span><br><span class="line"> System.out.println(mockedList.get(999));</span><br><span class="line"></span><br><span class="line"> //you can also verify using an argument matcher</span><br><span class="line"> // 你也可以验证参数匹配器</span><br><span class="line"> verify(mockedList).get(anyInt());</span><br></pre></td></tr></table></figure>
+
+<p>参数匹配器使验证和测试桩变得更灵活。<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Matchers.html" target="_blank" rel="noopener">点击这里</a>查看更多内置的匹配器以及自定义参数匹配器或者hamcrest 匹配器的示例。</p>
+<p>如果仅仅是获取自定义参数匹配器的信息，查看<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/ArgumentMatcher.html" target="_blank" rel="noopener">ArgumentMatcher</a>类文档即可。</p>
+<p>为了合理的使用复杂的参数匹配，使用equals()与anyX() 的匹配器会使得测试代码更简洁、简单。有时，会迫使你重构代码以使用equals()匹配或者实现equals()函数来帮助你进行测试。</p>
+<p>同时建议你阅读<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#15" target="_blank" rel="noopener">第15章节</a>或者<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/ArgumentCaptor.html" target="_blank" rel="noopener">ArgumentCaptor</a>类文档。ArgumentCaptor是一个能够捕获参数值的特俗参数匹配器。</p>
+<p>参数匹配器的注意点 :</p>
+<p>如果你使用参数匹配器,所有参数都必须由匹配器提供。</p>
+<p>示例 : ( 该示例展示了如何多次应用于测试桩函数的验证 )</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">verify(mock).someMethod(anyInt(), anyString(), eq(&quot;third argument&quot;));</span><br><span class="line">//above is correct - eq() is also an argument matcher</span><br><span class="line">// 上述代码是正确的,因为eq()也是一个参数匹配器</span><br><span class="line"></span><br><span class="line">verify(mock).someMethod(anyInt(), anyString(), &quot;third argument&quot;);</span><br><span class="line">//above is incorrect - exception will be thrown because third argument </span><br><span class="line">// 上述代码是错误的,因为所有参数必须由匹配器提供，而参数&quot;third argument&quot;并非由参数匹配器提供，因此的缘故会抛出异常</span><br></pre></td></tr></table></figure>
+
+<p>像anyObject(), eq()这样的匹配器函数不会返回匹配器。它们会在内部将匹配器记录到一个栈当中，并且返回一个假的值，通常为null。这样的实现是由于被Java编译器强加的静态类型安全。结果就是你不能在验证或者测试桩函数之外使用anyObject(), eq()函数。</p>
+<h5 id="验证函数的确切、最少、从未调用次数"><a href="#验证函数的确切、最少、从未调用次数" class="headerlink" title="验证函数的确切、最少、从未调用次数"></a>验证函数的确切、最少、从未调用次数</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//using mock</span><br><span class="line">mockedList.add(&quot;once&quot;);</span><br><span class="line"></span><br><span class="line">mockedList.add(&quot;twice&quot;);</span><br><span class="line">mockedList.add(&quot;twice&quot;);</span><br><span class="line"></span><br><span class="line">mockedList.add(&quot;three times&quot;);</span><br><span class="line">mockedList.add(&quot;three times&quot;);</span><br><span class="line">mockedList.add(&quot;three times&quot;);</span><br><span class="line"></span><br><span class="line">//following two verifications work exactly the same - times(1) is used by default</span><br><span class="line">// 下面的两个验证函数效果一样,因为verify默认验证的就是times(1)</span><br><span class="line">verify(mockedList).add(&quot;once&quot;);</span><br><span class="line">verify(mockedList, times(1)).add(&quot;once&quot;);</span><br><span class="line"></span><br><span class="line">//exact number of invocations verification</span><br><span class="line">// 验证具体的执行次数</span><br><span class="line">verify(mockedList, times(2)).add(&quot;twice&quot;);</span><br><span class="line">verify(mockedList, times(3)).add(&quot;three times&quot;);</span><br><span class="line"></span><br><span class="line">//verification using never(). never() is an alias to times(0)</span><br><span class="line">// 使用never()进行验证,never相当于times(0)</span><br><span class="line">verify(mockedList, never()).add(&quot;never happened&quot;);</span><br><span class="line"></span><br><span class="line">//verification using atLeast()/atMost()</span><br><span class="line">// 使用atLeast()/atMost()</span><br><span class="line">verify(mockedList, atLeastOnce()).add(&quot;three times&quot;);</span><br><span class="line">verify(mockedList, atLeast(2)).add(&quot;five times&quot;);</span><br><span class="line">verify(mockedList, atMost(5)).add(&quot;three times&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>verify函数默认验证的是执行了times(1)，也就是某个测试函数是否执行了1次.因此，times(1)通常被省略了。</p>
+<h5 id="为返回值为void的函数通过Stub抛出异常"><a href="#为返回值为void的函数通过Stub抛出异常" class="headerlink" title="为返回值为void的函数通过Stub抛出异常"></a>为返回值为void的函数通过Stub抛出异常</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">doThrow(new RuntimeException()).when(mockedList).clear();</span><br><span class="line"></span><br><span class="line">//following throws RuntimeException:</span><br><span class="line">// 调用这句代码会抛出异常</span><br><span class="line">mockedList.clear();</span><br></pre></td></tr></table></figure>
+
+<p>关于doThrow|doAnswer 等函数族的信息请阅读<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#12" target="_blank" rel="noopener">第十二章节</a>。</p>
+<p>最初，stubVoid(Object) 函数用于为无返回值的函数打桩。现在stubVoid()函数已经过时,doThrow(Throwable)成为了它的继承者。这是为了提升与 doAnswer(Answer) 函数族的可读性与一致性。</p>
+<h5 id="验证方法执行顺序-1"><a href="#验证方法执行顺序-1" class="headerlink" title="验证方法执行顺序"></a>验证方法执行顺序</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">// A. Single mock whose methods must be invoked in a particular order</span><br><span class="line">// A. 验证mock一个对象的函数执行顺序</span><br><span class="line">List singleMock = mock(List.class);</span><br><span class="line"></span><br><span class="line">//using a single mock</span><br><span class="line">singleMock.add(&quot;was added first&quot;);</span><br><span class="line">singleMock.add(&quot;was added second&quot;);</span><br><span class="line"></span><br><span class="line">//create an inOrder verifier for a single mock</span><br><span class="line">// 为该mock对象创建一个inOrder对象</span><br><span class="line">InOrder inOrder = inOrder(singleMock);</span><br><span class="line"></span><br><span class="line">//following will make sure that add is first called with &quot;was added first, then with &quot;was added second&quot;</span><br><span class="line">// 确保add函数首先执行的是add(&quot;was added first&quot;),然后才是add(&quot;was added second&quot;)</span><br><span class="line">inOrder.verify(singleMock).add(&quot;was added first&quot;);</span><br><span class="line">inOrder.verify(singleMock).add(&quot;was added second&quot;);</span><br><span class="line"></span><br><span class="line">// B. Multiple mocks that must be used in a particular order</span><br><span class="line">// B .验证多个mock对象的函数执行顺序</span><br><span class="line">List firstMock = mock(List.class);</span><br><span class="line">List secondMock = mock(List.class);</span><br><span class="line"></span><br><span class="line">//using mocks</span><br><span class="line">firstMock.add(&quot;was called first&quot;);</span><br><span class="line">secondMock.add(&quot;was called second&quot;);</span><br><span class="line"></span><br><span class="line">//create inOrder object passing any mocks that need to be verified in order</span><br><span class="line">// 为这两个Mock对象创建inOrder对象</span><br><span class="line">InOrder inOrder = inOrder(firstMock, secondMock);</span><br><span class="line"></span><br><span class="line">//following will make sure that firstMock was called before secondMock</span><br><span class="line">// 验证它们的执行顺序</span><br><span class="line">inOrder.verify(firstMock).add(&quot;was called first&quot;);</span><br><span class="line">inOrder.verify(secondMock).add(&quot;was called second&quot;);</span><br><span class="line"></span><br><span class="line">// Oh, and A + B can be mixed together at will</span><br></pre></td></tr></table></figure>
+
+<p>验证执行顺序是非常灵活的-你不需要一个一个的验证所有交互,只需要验证你感兴趣的对象即可。 另外，你可以仅通过那些需要验证顺序的mock对象来创建InOrder对象。</p>
+<h5 id="确保交互（interaction）操作不会执行在mock对象上"><a href="#确保交互（interaction）操作不会执行在mock对象上" class="headerlink" title="确保交互（interaction）操作不会执行在mock对象上"></a>确保交互（interaction）操作不会执行在mock对象上</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">//using mocks - only mockOne is interacted</span><br><span class="line">// 使用Mock对象</span><br><span class="line">mockOne.add(&quot;one&quot;);</span><br><span class="line"></span><br><span class="line">//ordinary verification</span><br><span class="line">// 普通验证</span><br><span class="line">verify(mockOne).add(&quot;one&quot;);</span><br><span class="line"></span><br><span class="line">//verify that method was never called on a mock</span><br><span class="line">// 验证某个交互是否从未被执行</span><br><span class="line">verify(mockOne, never()).add(&quot;two&quot;);</span><br><span class="line"></span><br><span class="line">//verify that other mocks were not interacted</span><br><span class="line">// 验证mock对象没有交互过</span><br><span class="line">verifyZeroInteractions(mockTwo, mockThree);</span><br></pre></td></tr></table></figure>
+
+<h5 id="查找冗余的调用"><a href="#查找冗余的调用" class="headerlink" title="查找冗余的调用"></a>查找冗余的调用</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//using mocks</span><br><span class="line">mockedList.add(&quot;one&quot;);</span><br><span class="line">mockedList.add(&quot;two&quot;);</span><br><span class="line"></span><br><span class="line">verify(mockedList).add(&quot;one&quot;);</span><br><span class="line"></span><br><span class="line">//following verification will fail</span><br><span class="line">// 下面的验证将会失败</span><br><span class="line">verifyNoMoreInteractions(mockedList);</span><br></pre></td></tr></table></figure>
+
+<p>一些用户可能会在频繁地使用verifyNoMoreInteractions()，甚至在每个测试函数中都用。但是verifyNoMoreInteractions()并不建议在每个测试函数中都使用。verifyNoMoreInteractions()在交互测试套件中只是一个便利的验证，它的作用是当你需要验证是否存在冗余调用时。滥用它将导致测试代码的可维护性降低。你可以阅读<a href="https://monkeyisland.pl/2008/07/12/should-i-worry-about-the-unexpected/" target="_blank" rel="noopener">这篇文档</a>来了解更多相关信息。</p>
+<p>never()是一种更为明显且易于理解的形式。</p>
+<h5 id="简化mock对象的创建"><a href="#简化mock对象的创建" class="headerlink" title="简化mock对象的创建"></a>简化mock对象的创建</h5><ul>
+<li>最小化重复的创建代码</li>
+<li>使测试类的代码可读性更高</li>
+<li>使验证错误更易于阅读，因为字段名可用于标识mock对象<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ArticleManagerTest &#123;</span><br><span class="line"></span><br><span class="line">   @Mock private ArticleCalculator calculator;</span><br><span class="line">   @Mock private ArticleDatabase database;</span><br><span class="line">   @Mock private UserProvider userProvider;</span><br><span class="line"></span><br><span class="line">   private ArticleManager manager;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>注意！下面这句代码需要在运行测试函数之前被调用,一般放到测试类的基类或者test runner中:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MockitoAnnotations.initMocks(testClass);</span><br></pre></td></tr></table></figure>
+
+<p>你可以使用内置的runner: <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoJUnitRunner.html" target="_blank" rel="noopener">MockitoJUnitRunner</a> 或者一个rule : <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoRule.html" target="_blank" rel="noopener">MockitoRule</a>。 关于mock注解的更多信息可以阅读<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockitoAnnotations.html" target="_blank" rel="noopener">MockitoAnnotations文档</a>。</p>
+<h5 id="为连续的调用做测试桩（stub）"><a href="#为连续的调用做测试桩（stub）" class="headerlink" title="为连续的调用做测试桩（stub）"></a>为连续的调用做测试桩（stub）</h5><p>有时我们需要为同一个函数调用的不同的返回值或异常做测试桩。典型的运用就是使用mock迭代器。 原始版本的Mockito并没有这个特性，例如，可以使用Iterable或者简单的集合来替换迭代器。这些方法提供了更自然的方式，在一些场景中为连续的调用做测试桩会很有用。示例如下 ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">when(mock.someMethod(&quot;some arg&quot;))</span><br><span class="line">  .thenThrow(new RuntimeException())</span><br><span class="line">  .thenReturn(&quot;foo&quot;);</span><br><span class="line"></span><br><span class="line">//First call: throws runtime exception:</span><br><span class="line">// 第一次调用 : 抛出运行时异常</span><br><span class="line">mock.someMethod(&quot;some arg&quot;);</span><br><span class="line"></span><br><span class="line">//Second call: prints &quot;foo&quot;</span><br><span class="line">// 第二次调用 : 输出&quot;foo&quot;</span><br><span class="line">System.out.println(mock.someMethod(&quot;some arg&quot;));</span><br><span class="line"></span><br><span class="line">//Any consecutive call: prints &quot;foo&quot; as well (last stubbing wins).</span><br><span class="line">// 后续调用 : 也是输出&quot;foo&quot;</span><br><span class="line">System.out.println(mock.someMethod(&quot;some arg&quot;));</span><br></pre></td></tr></table></figure>
+
+<p>另外，连续调用的另一种更简短的版本 :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 第一次调用时返回&quot;one&quot;,第二次返回&quot;two&quot;,第三次返回&quot;three&quot;</span><br><span class="line">when(mock.someMethod(&quot;some arg&quot;))</span><br><span class="line">   .thenReturn(&quot;one&quot;, &quot;two&quot;, &quot;three&quot;);</span><br></pre></td></tr></table></figure>
+
+<h5 id="为回调做测试桩"><a href="#为回调做测试桩" class="headerlink" title="为回调做测试桩"></a>为回调做测试桩</h5><p>Allows stubbing with generic Answer interface. 运行为泛型接口Answer打桩。</p>
+<p>在最初的Mockito里也没有这个具有争议性的特性。我们建议使用thenReturn() 或thenThrow()来打桩。这两种方法足够用于测试或者测试驱动开发。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">when(mock.someMethod(anyString())).thenAnswer(new Answer() &#123;</span><br><span class="line">    Object answer(InvocationOnMock invocation) &#123;</span><br><span class="line">        Object[] args = invocation.getArguments();</span><br><span class="line">        Object mock = invocation.getMock();</span><br><span class="line">        return &quot;called with arguments: &quot; + args;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//Following prints &quot;called with arguments: foo&quot;</span><br><span class="line">// 输出 : &quot;called with arguments: foo&quot;</span><br><span class="line">System.out.println(mock.someMethod(&quot;foo&quot;));</span><br></pre></td></tr></table></figure>
+
+<h5 id="doReturn-、doThrow-、doAnswer-、doNothing-、doCallRealMethod-系列方法的运用"><a href="#doReturn-、doThrow-、doAnswer-、doNothing-、doCallRealMethod-系列方法的运用" class="headerlink" title="doReturn()、doThrow()、doAnswer()、doNothing()、doCallRealMethod()系列方法的运用"></a>doReturn()、doThrow()、doAnswer()、doNothing()、doCallRealMethod()系列方法的运用</h5><p>通过when(Object)为无返回值的函数打桩有不同的方法,因为编译器不喜欢void函数在括号内…</p>
+<p>使用doThrow(Throwable) 替换stubVoid(Object)来为void函数打桩是为了与doAnswer()等函数族保持一致性。</p>
+<p>当你想为void函数打桩时使用含有一个exception 参数的doAnswer() :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">doThrow(new RuntimeException()).when(mockedList).clear();</span><br><span class="line"></span><br><span class="line">//following throws RuntimeException:</span><br><span class="line">// 下面的代码会抛出异常</span><br><span class="line">mockedList.clear();</span><br></pre></td></tr></table></figure>
+
+<p>当你调用doThrow(), doAnswer(), doNothing(), doReturn() and doCallRealMethod() 这些函数时可以在适当的位置调用when()函数. 当你需要下面这些功能时这是必须的:</p>
+<ul>
+<li>测试void函数</li>
+<li>在受监控的对象上测试函数</li>
+<li>不知一次的测试为同一个函数，在测试过程中改变mock对象的行为。</li>
+</ul>
+<p>但是在调用when()函数时你可以选择是否调用这些上述这些函数。</p>
+<p>阅读更多关于这些方法的信息:</p>
+<ul>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doReturn-java.lang.Object-" target="_blank" rel="noopener">doReturn(Object)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doThrow-java.lang.Throwable...-" target="_blank" rel="noopener">doThrow(Throwable)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doThrow-java.lang.Class-" target="_blank" rel="noopener">doThrow(Class)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doAnswer-org.mockito.stubbing.Answer-" target="_blank" rel="noopener">doAnswer(Answer)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doNothing--" target="_blank" rel="noopener">doNothing()</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#doCallRealMethod--" target="_blank" rel="noopener">doCallRealMethod()</a></li>
+</ul>
+<h5 id="监控真实对象"><a href="#监控真实对象" class="headerlink" title="监控真实对象"></a>监控真实对象</h5><p>你可以为真实对象创建一个监控(spy)对象。当你使用这个spy对象时真实的对象也会也调用，除非它的函数被stub了。尽量少使用spy对象，使用时也需要小心形式，例如spy对象可以用来处理遗留代码。</p>
+<p>监控一个真实的对象可以与“局部mock对象”概念结合起来。在1.8之前，mockito的监控功能并不是真正的局部mock对象。原因是我们认为局部mock对象的实现方式并不好，在某些时候我发现一些使用局部mock对象的合法用例。（第三方接口、临时重构遗留代码，完整的文章在<a href="https://monkeyisland.pl/2009/01/13/subclass-and-override-vs-partial-mocking-vs-refactoring/" target="_blank" rel="noopener">这里</a>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">List list = new LinkedList();</span><br><span class="line">List spy = spy(list);</span><br><span class="line"></span><br><span class="line">//optionally, you can stub out some methods:</span><br><span class="line">// 你可以为某些函数打桩</span><br><span class="line">when(spy.size()).thenReturn(100);</span><br><span class="line"></span><br><span class="line">//using the spy calls *real* methods</span><br><span class="line">// 通过spy对象调用真实对象的函数</span><br><span class="line">spy.add(&quot;one&quot;);</span><br><span class="line">spy.add(&quot;two&quot;);</span><br><span class="line"></span><br><span class="line">//prints &quot;one&quot; - the first element of a list</span><br><span class="line">// 输出第一个元素</span><br><span class="line">System.out.println(spy.get(0));</span><br><span class="line"></span><br><span class="line">//size() method was stubbed - 100 is printed</span><br><span class="line">// 因为size()函数被打桩了,因此这里返回的是100</span><br><span class="line">System.out.println(spy.size());</span><br><span class="line"></span><br><span class="line">//optionally, you can verify</span><br><span class="line">// 交互验证</span><br><span class="line">verify(spy).add(&quot;one&quot;);</span><br><span class="line">verify(spy).add(&quot;two&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>Spy实际对象时的重要提示</strong></p>
+<ul>
+<li>有时使用when(Object) 来做spy的存根是不可能或者行不通的。在这种情况下使用sky请考虑doReturn|Answer|Throw() 方法家族来做存根。例如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List list = new LinkedList();</span><br><span class="line">List spy = spy(list);</span><br><span class="line"></span><br><span class="line">//Impossible: real method is called so spy.get(0) throws IndexOutOfBoundsException (the list is yet empty)</span><br><span class="line">// 不可能 : 因为当调用spy.get(0)时会调用真实对象的get(0)函数,此时会发生IndexOutOfBoundsException异常，因为真实List对象是空的</span><br><span class="line">   when(spy.get(0)).thenReturn(&quot;foo&quot;);</span><br><span class="line"></span><br><span class="line">//You have to use doReturn() for stubbing</span><br><span class="line">// 你需要使用doReturn()来打桩</span><br><span class="line">doReturn(&quot;foo&quot;).when(spy).get(0);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>mockito 不会 将调用代理给被传递进去的实际实例，取而代之的是创建它的一个拷贝。因此如果你持有真实实例并和它交互，不要期待spy会感知到这些交互和实际实例的状态影响。推论是说，当一个非存根方法在sky上被调用，而不是在真实实例上调用，真实实例不会有任何影响。  </li>
+<li>对final方法保持警惕。mockito不mock final方法，因此底线是：当你在一个真实对象上sky + 你想存根一个final方法 = 问题。同样也无法验证这些方法。</li>
+</ul>
+<h5 id="修改没有测试桩的调用的默认返回值-1-7"><a href="#修改没有测试桩的调用的默认返回值-1-7" class="headerlink" title="修改没有测试桩的调用的默认返回值 ( 1.7+ )"></a>修改没有测试桩的调用的默认返回值 ( 1.7+ )</h5><p>你可以指定策略来创建mock对象的返回值。这是一个高级特性，通常来说，你不需要写这样的测试。然后，它对于遗留系统来说是很有用处的。当你不需要为函数调用打桩时你可以指定一个默认的answer。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Foo mock = mock(Foo.class, Mockito.RETURNS_SMART_NULLS);</span><br><span class="line">Foo mockTwo = mock(Foo.class, new YourOwnAnswer());</span><br></pre></td></tr></table></figure>
+
+<p>关于RETURNS_SMART_NULLS更多的信息请查看 : [RETURNS_SMART_NULLS](关于RETURNS_SMART_NULLS更多的信息请查看 : RETURNS_SMART_NULLS文档 。)文档 。</p>
+<h5 id="为下一步的断言捕获参数-1-8"><a href="#为下一步的断言捕获参数-1-8" class="headerlink" title="为下一步的断言捕获参数 (1.8+)"></a>为下一步的断言捕获参数 (1.8+)</h5><p>Mockito以java代码风格的形式来验证参数值 : 即通过使用equals()函数。这也是我们推荐用于参数匹配的方式，因为这样会使得测试代码更简单、简洁。在某些情况下，当验证交互之后要检测真实的参数值时这将变得有用。例如 ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ArgumentCaptor&lt;Person&gt; argument = ArgumentCaptor.forClass(Person.class);</span><br><span class="line">// 参数捕获</span><br><span class="line">verify(mock).doSomething(argument.capture());</span><br><span class="line">// 使用equal断言</span><br><span class="line">assertEquals(&quot;John&quot;, argument.getValue().getName());</span><br></pre></td></tr></table></figure>
+
+<p>警告 : 我们建议使用没有测试桩的ArgumentCaptor来验证，因为使用含有测试桩的ArgumentCaptor会降低测试代码的可读性，因为captor是在断言代码块之外创建的。另一个好处是它可以降低本地化的缺点，因为如果测试桩函数没有被调用，那么参数就不会被捕获。总之，ArgumentCaptor与自定义的参数匹配器相关(可以查看<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/ArgumentMatcher.html" target="_blank" rel="noopener">ArgumentMatcher</a>的文档 )。这两种技术都能用于检测外部传递到Mock对象的参数。然而，使用ArgumentCaptor在以下的情况下更合适 :</p>
+<ul>
+<li>自定义不能被重用的参数匹配器</li>
+<li>你仅需要断言参数值</li>
+</ul>
+<h5 id="真实的局部mocks-1-8"><a href="#真实的局部mocks-1-8" class="headerlink" title="真实的局部mocks(1.8+)"></a>真实的局部mocks(1.8+)</h5><p>在内部通过邮件进行了无数争辩和讨论后，最终 Mockito 决定支持部分测试，早前我们不支持是因为我们认为部分测试会让代码变得糟糕。然而，我们发现了部分测试真正合理的用法。<a href="https://monkeyisland.pl/2009/01/13/subclass-and-override-vs-partial-mocking-vs-refactoring/" target="_blank" rel="noopener">详情点这</a></p>
+<p>在 Mockito 1.8 之前，spy() 方法并不会产生真正的部分测试，而这无疑会让一些开发者困惑。更详细的内容可以看：<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#13" target="_blank" rel="noopener">这里</a>或<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#spy-T-" target="_blank" rel="noopener">Java文档</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//用spy()方法创建partial mock:</span><br><span class="line">List list = spy(new LinkedList());</span><br><span class="line"></span><br><span class="line">//可以有选择的在mock上开启partial mock</span><br><span class="line">Foo mock = mock(Foo.class);</span><br><span class="line">//确保实际实现是&apos;安全的&apos;。</span><br><span class="line">//如果实际实现抛出异常或者依赖对象的特定状态，那么将会遇到麻烦</span><br><span class="line">when(mock.someMethod()).thenCallRealMethod();</span><br></pre></td></tr></table></figure>
+
+<p>一如既往，你会去读部分测试的警告部分：面向对象编程通过将抽象的复杂度拆分为一个个独立，精确的 SRPy 对象中，降低了抽象处理的复杂度。那部分测试是怎么遵循这个规范的呢？事实上部分测试并没有遵循这个规范……部分测试通常意味着抽象的复杂度被移动到同一个对象的不同方法中，在大多数情况下，这不会是你想要的应用架构方式。</p>
+<p>然而，在一些罕见的情况下部分测试才会是易用的：处理不能轻易修改的代码（第三方接口，临时重构的遗留代码等等）。然而，为了新的，测试驱动和架构优秀的代码，我是不会使用部分测试的。</p>
+<h5 id="重置mock对象-1-8"><a href="#重置mock对象-1-8" class="headerlink" title="重置mock对象(1.8+)"></a>重置mock对象(1.8+)</h5><p>聪明的 Mockito 使用者很少会用到这个特性，因为他们知道这是出现糟糕测试单元的信号。通常情况下你不会需要重设你的测试单元，只需要为每一个测试方法重新创建一个测试单元就可以了。</p>
+<p>如果你真的想通过 reset() 方法满足某些需求的话，请考虑实现简单，小而且专注于测试方法而不是冗长，精确的测试。首先可能出现的代码异味就是测试方法中间那的 reset() 方法。这可能意味着你已经过度测试了。请遵循测试方法的呢喃：请让我们小，而且专注于单一的行为上。在 Mockito 邮件列表中就有好几个讨论是和这个有关的。</p>
+<p>添加 reset() 方法的唯一原因就是让它能与容器注入的测试单元协作。更多信息请参见FAQ(<a href="https://github.com/mockito/mockito/wiki/FAQ" target="_blank" rel="noopener">这里</a>)。</p>
+<p>别自己给自己找麻烦，reset()方法在测试方法的中间确实是代码异味。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List mock = mock(List.class);</span><br><span class="line">when(mock.size()).thenReturn(10);</span><br><span class="line">mock.add(1);</span><br><span class="line"></span><br><span class="line">reset(mock);</span><br><span class="line">//at this point the mock forgot any interactions &amp; stubbing</span><br></pre></td></tr></table></figure>
+
+<h5 id="故障排查与验证框架的使用-1-8"><a href="#故障排查与验证框架的使用-1-8" class="headerlink" title="故障排查与验证框架的使用 (1.8+)"></a>故障排查与验证框架的使用 (1.8+)</h5><p>首先，如果出现了任何问题，我建议你先看<a href="https://github.com/mockito/mockito/wiki/FAQ" target="_blank" rel="noopener">Mockito FAQ</a>。</p>
+<p>任何你提的问题都会被提交到 Mockito 的<a href="http://groups.google.com/group/mockito" target="_blank" rel="noopener">邮件列表</a>中。</p>
+<p>然后你应该知道 Mockito 会验证你是否始终以正确的方式使用它，对此有疑惑的话不妨看看<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#validateMockitoUsage--" target="_blank" rel="noopener">validateMockitoUsage()</a>的文档说明。</p>
+<h5 id="行为驱动开发的别名（1-8-）"><a href="#行为驱动开发的别名（1-8-）" class="headerlink" title="行为驱动开发的别名（1.8+）"></a>行为驱动开发的别名（1.8+）</h5><p>行为驱动开发实现测试单元的模式将 //given //when //then comments 视作测试方法的基础，这也是我们实现单元测试时被建议做的！</p>
+<p><a href="ttp://en.wikipedia.org/wiki/Behavior_Driven_Development" target="_blank" rel="noopener">你可以在这开始学习有关 BDD 的知识</a></p>
+<p>问题是当信息没有很好地与 //given //when //then comments 交互时，扮演规范角色的测试桩 API 就会出现问题。这是因为测试桩属于给定测试单元的组件，而且不是任何测试的组件。因此<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/BDDMockito.html" target="_blank" rel="noopener">BDDMockito</a>类介绍了一个别名，使你的测试桩方法调用<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/BDDMockito.html#given-T-" target="_blank" rel="noopener">BDDMockito.given(Object)</a>方法。现在它可以很好地和给定的 BDD 模式的测试单元组件进行交互。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import static org.mockito.BDDMockito.*;</span><br><span class="line"></span><br><span class="line">Seller seller = mock(Seller.class);</span><br><span class="line">Shop shop = new Shop(seller);</span><br><span class="line"></span><br><span class="line">public void shouldBuyBread() throws Exception &#123;</span><br><span class="line">  //given</span><br><span class="line">  given(seller.askForBread()).willReturn(new Bread());</span><br><span class="line"></span><br><span class="line">  //when</span><br><span class="line">  Goods goods = shop.buyBread();</span><br><span class="line"></span><br><span class="line">  //then</span><br><span class="line">  assertThat(goods, containBread());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="序列化mock对象"><a href="#序列化mock对象" class="headerlink" title="序列化mock对象"></a>序列化mock对象</h5><p>模拟对象可以被序列化。有了这个特性你就可以在依赖被序列化的情况下使用模拟对象了。</p>
+<p>警告：这个特性很少在单元测试中被使用。</p>
+<p>这个特性通过 BDD 拥有不可考外部依赖的特性的具体用例实现，来自外部依赖的 Web 环境和对象会被序列化，然后在不同层之间被传递。</p>
+<p>创建可序列化的模拟使用:ockSettings.serializable()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List serializableMock = mock(List.class, withSettings().serializable());</span><br></pre></td></tr></table></figure>
+
+<p>模拟对象能被序列化假设所有普通的序列化要求都被类满足了。</p>
+<p>让一个真实的侦查对象可序列化需要多一些努力，因为 spy(…) 方法没有接收 MockSettings 的重载版本。不过不用担心，你几乎不可能用到这。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; list = new ArrayList&lt;Object&gt;();</span><br><span class="line">List&lt;Object&gt; spy = mock(ArrayList.class, withSettings()</span><br><span class="line">                .spiedInstance(list)</span><br><span class="line">                .defaultAnswer(CALLS_REAL_METHODS)</span><br><span class="line">                .serializable());</span><br></pre></td></tr></table></figure>
+
+<h5 id="新的注解-Captor-Spy-InjectMocks-1-8-3"><a href="#新的注解-Captor-Spy-InjectMocks-1-8-3" class="headerlink" title="新的注解:@Captor,@Spy,@ InjectMocks (1.8.3+)"></a>新的注解:@Captor,@Spy,@ InjectMocks (1.8.3+)</h5><p>V1.8.3带来了新的注释，有时可能会有所帮助：</p>
+<ul>
+<li>[@Captor] 简化 ArgumentCaptor 的创建 - 当需要捕获的参数是一个令人讨厌的通用类，而且你想避免编译时警告。</li>
+<li>@Spy - 你可以用它代替 spy(Object) 方法</li>
+<li>@InjectMocks - 自动将模拟对象或侦查域注入到被测试对象中。</li>
+</ul>
+<p>需要注意的是 @InjectMocks 也能与 @Spy 一起使用，这就意味着 Mockito 会注入模拟对象到测试的部分测试中。它的复杂度也是你应该使用部分测试原因。</p>
+<p>所有新的注解仅仅在 MockitoAnnotations.initMocks(Object) 方法中被处理，就像你在 built-in runner 中使用的 @Mock 注解：MockitoJUnitRunner 或 规范: MockitoRule.</p>
+<h5 id="验证超时"><a href="#验证超时" class="headerlink" title="验证超时"></a>验证超时</h5><p>允许验证超时。它会导致验证等待指定的时间间隔等待所需的交互，而不是在尚未发生的情况下立即失败。在并发条件下测试可能有用。</p>
+<p>这个特性应该很少使用——找出一种更好的方法来测试您的多线程系统。</p>
+<p>还没有实现去和InOrder验证协作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//passes when someMethod() is called within given time span</span><br><span class="line">verify(mock, timeout(100)).someMethod();</span><br><span class="line">//above is an alias to:</span><br><span class="line">verify(mock, timeout(100).times(1)).someMethod();</span><br><span class="line"></span><br><span class="line">//passes when someMethod() is called *exactly* 2 times within given time span</span><br><span class="line">verify(mock, timeout(100).times(2)).someMethod();</span><br><span class="line"></span><br><span class="line">//passes when someMethod() is called *at least* 2 times within given time span</span><br><span class="line">verify(mock, timeout(100).atLeast(2)).someMethod();</span><br><span class="line"></span><br><span class="line">//verifies someMethod() within given time span using given verification mode</span><br><span class="line">//useful only if you have your own custom verification modes.</span><br><span class="line">verify(mock, new Timeout(100, yourOwnVerificationMode)).someMethod();</span><br></pre></td></tr></table></figure>
+
+<h5 id="自动初始化-Spies-InjectMocks注解的字段以及构造函数注入-1-9-0"><a href="#自动初始化-Spies-InjectMocks注解的字段以及构造函数注入-1-9-0" class="headerlink" title="自动初始化@Spies, @InjectMocks注解的字段以及构造函数注入(1.9.0+)"></a>自动初始化@Spies, @InjectMocks注解的字段以及构造函数注入(1.9.0+)</h5><p>Mockito 现在会通过注入构造方法、setter 或域注入尽可能初始化带有<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Spy.html" target="_blank" rel="noopener">@Spy</a>和<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/InjectMocks.html" target="_blank" rel="noopener">@InjectMocks</a>注解的域或方法。</p>
+<p>为了利用这一点特性，你需要使用<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockitoAnnotations.html#initMocks-java.lang.Object-" target="_blank" rel="noopener">MockitoAnnotations.initMocks(Object)</a>, <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoJUnitRunner.html" target="_blank" rel="noopener">MockitoJUnitRunner</a>或<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoRule.html" target="_blank" rel="noopener">MockitoRule</a>。</p>
+<p>请阅读关于<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/InjectMocks.html" target="_blank" rel="noopener">InjectMocks</a>在javadoc中可用的技巧和注入规则的更多信息</p>
+<h5 id="单行测试桩-1-9-0"><a href="#单行测试桩-1-9-0" class="headerlink" title="单行测试桩(1.9.0+)"></a>单行测试桩(1.9.0+)</h5><p>Mockito 现在允许你在使用测试桩时创建模拟对象。基本上，它允许在一行代码中创建一个测试桩，这对保持代码的整洁很有用。举例来说，有些乏味的测试桩会被创建，并在测试初始化域时被打入，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public class CarTest &#123;</span><br><span class="line">  Car boringStubbedCar = when(mock(Car.class).shiftGear()).thenThrow(EngineNotStarted.class).getMock();</span><br><span class="line"></span><br><span class="line">  @Test public void should... &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证被忽略的测试桩-1-9-0"><a href="#验证被忽略的测试桩-1-9-0" class="headerlink" title="验证被忽略的测试桩 (1.9.0+)"></a>验证被忽略的测试桩 (1.9.0+)</h5><p>Mockito 现在允许为了验证无视测试桩。在与 verifyNoMoreInteractions() 方法或验证 inOrder() 方法耦合时，有些时候会很有用。帮助避免繁琐的打入测试桩调用验证 - 显然我们不会对验证测试桩感兴趣。</p>
+<p>警告，ignoreStubs() 可能会导致 verifyNoMoreInteractions(ignoreStubs(…)) 的过度使用。谨记在心，Mockito 没有推荐用 verifyNoMoreInteractions() 方法连续地施用于每一个测试中，原因在Java文档<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#verifyNoMoreInteractions-java.lang.Object...-" target="_blank" rel="noopener">这里</a>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">verify(mock).foo();</span><br><span class="line">verify(mockTwo).bar();</span><br><span class="line"></span><br><span class="line">//ignores all stubbed methods:</span><br><span class="line">verifyNoMoreInteractions(ignoreStubs(mock, mockTwo));</span><br><span class="line"></span><br><span class="line">//creates InOrder that will ignore stubbed</span><br><span class="line">InOrder inOrder = inOrder(ignoreStubs(mock, mockTwo));</span><br><span class="line">inOrder.verify(mock).foo();</span><br><span class="line">inOrder.verify(mockTwo).bar();</span><br><span class="line">inOrder.verifyNoMoreInteractions();</span><br></pre></td></tr></table></figure>
+
+<p>可以在javadoc中找到有关<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#ignoreStubs-java.lang.Object...-" target="_blank" rel="noopener">ignoreStubs(Object…)</a>的高级示例和更多细节。</p>
+<h5 id="Mocking-详情（改善2-2-x）"><a href="#Mocking-详情（改善2-2-x）" class="headerlink" title="Mocking 详情（改善2.2.x）"></a>Mocking 详情（改善2.2.x）</h5><p>Mockito提供API来检查模拟对象的细节。此API对于高级用户和模拟框架集成商非常有用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">//To identify whether a particular object is a mock or a spy:</span><br><span class="line">Mockito.mockingDetails(someObject).isMock();</span><br><span class="line">Mockito.mockingDetails(someObject).isSpy();</span><br><span class="line"></span><br><span class="line">//Getting details like type to mock or default answer:</span><br><span class="line">MockingDetails details = mockingDetails(mock);</span><br><span class="line">details.getMockCreationSettings().getTypeToMock();</span><br><span class="line">details.getMockCreationSettings().getDefaultAnswer();</span><br><span class="line"></span><br><span class="line">//Getting interactions and stubbings of the mock:</span><br><span class="line">MockingDetails details = mockingDetails(mock);</span><br><span class="line">details.getInteractions();</span><br><span class="line">details.getStubbings();</span><br><span class="line"></span><br><span class="line">//Printing all interactions (including stubbing, unused stubs)</span><br><span class="line">System.out.println(mockingDetails(mock).printInvocations());</span><br></pre></td></tr></table></figure>
+
+<p>有关更多信息，请参见javadoc <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockingDetails.html" target="_blank" rel="noopener">MockingDetails</a>。</p>
+<h5 id="委托调用真实实例-1-9-5"><a href="#委托调用真实实例-1-9-5" class="headerlink" title="委托调用真实实例(1.9.5+)"></a>委托调用真实实例(1.9.5+)</h5><p>当使用常规的 spy API 去 mock 或者 spy 一个对象很困难时可以用 delegate 来 spy 或者 mock 对象的某一部分。 从 Mockito 的 1.10.11 版本开始， delegate 有可能和 mock 的类型相同也可能不同。如果不是同一类型， delegate 类型需要提供一个匹配方法否则就会抛出一个异常。下面是关于这个特性的一些用例:</p>
+<ul>
+<li>带有 interface 的 final 类</li>
+<li>已经自定义代理的对象</li>
+<li>带有 finalize 方法的特殊对象，就是避免重复执行。</li>
+</ul>
+<p>和常规 spy 的不同:</p>
+<ul>
+<li>标准的 spy (spy(Object)) 包含被 spy 实例的所有状态信息，方法在 spy 对象上被调用。被 spy 的对象只在 mock 创建时被用来拷贝状态信息。如果你通过标准 spy 调用一个方法，这个 spy 会调用其内部的其他方法记录这次操作， 以便后面验证使用。等效于存根 (stubbed)操作。</li>
+<li>mock delegates 只是简单的把所有方法委托给 delegate。delegate 一直被当成它代理的方法使用。如果你 从一个 mock 调用它被委托的方法，它会调用其内部方法，这些调用不会被记录，stubbing 在这里也不会生效。 Mock 的 delegates 相对于标准的 spy 来说功能弱了很多，不过在标准 spy 不能被创建的时候很有用。</li>
+</ul>
+<p>更多信息可以看这里<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/AdditionalAnswers.html#delegatesTo-java.lang.Object-" target="_blank" rel="noopener">AdditionalAnswers.delegatesTo(Object)</a>.</p>
+<h5 id="MockMaker-API-1-9-5"><a href="#MockMaker-API-1-9-5" class="headerlink" title="MockMaker API(1.9.5+)"></a>MockMaker API(1.9.5+)</h5><p>为了满足用户的需求和 Android 平台使用。Mockito 现在提供一个扩展点，允许替换代理生成引擎。默认情况下，Mockito 使用 cglib 创建动态代理。</p>
+<p>这个扩展点是为想要扩展 Mockito 功能的高级用户准备的。比如，我们现在就可以在 dexmaker 的帮助下使用 Mockito 测试 Android。</p>
+<p>更多的细节，原因和示例请看 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/plugins/MockMaker.html" target="_blank" rel="noopener">MockMaker</a> 的文档。</p>
+<h5 id="BDD风格的验证-1-10-0"><a href="#BDD风格的验证-1-10-0" class="headerlink" title="BDD风格的验证(1.10.0+)"></a>BDD风格的验证(1.10.0+)</h5><p>启 Behavior Driven Development (BDD) 风格的验证可以通过 BBD 的关键词 then 开始验证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">given(dog.bark()).willReturn(2);</span><br><span class="line"></span><br><span class="line">// when</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">then(person).should(times(2)).ride(bike);</span><br></pre></td></tr></table></figure>
+
+<p>更多信息请查阅 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/BDDMockito.html#then-T-" target="_blank" rel="noopener">BDDMockito.then(Object)</a></p>
+<h5 id="Spying或mocking抽象类-1-12-0"><a href="#Spying或mocking抽象类-1-12-0" class="headerlink" title="Spying或mocking抽象类(1.12.0)"></a>Spying或mocking抽象类(1.12.0)</h5><p>现在可以方便的 spy 一个抽象类。注意，过度使用 spy 或许意味着代码的设计上有问题。(see spy(Object)).</p>
+<p>之前，spying 只可以用在实例对象上。而现在新的 API 可以在创建一个 mock 实例时使用构造函数。这对 mock 一个抽象类来说是很重要的，这样使用者就不必再提供一个抽象类的实例了。目前的话只支持无参构造函数， 如果你认为这样还不够的话欢迎向我们反馈。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//convenience API, new overloaded spy() method:</span><br><span class="line"> SomeAbstract spy = spy(SomeAbstract.class);</span><br><span class="line"></span><br><span class="line"> //Robust API, via settings builder:</span><br><span class="line"> OtherAbstract spy = mock(OtherAbstract.class, withSettings()</span><br><span class="line">    .useConstructor().defaultAnswer(CALLS_REAL_METHODS));</span><br><span class="line"></span><br><span class="line"> //Mocking a non-static inner abstract class:</span><br><span class="line"> InnerAbstract spy = mock(InnerAbstract.class, withSettings()</span><br><span class="line">    .useConstructor().outerInstance(outerInstance).defaultAnswer(CALLS_REAL_METHODS));</span><br></pre></td></tr></table></figure>
+
+<p>更多信息请见 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockSettings.html#useConstructor-java.lang.Object...-" target="_blank" rel="noopener">MockSettings.useConstructor()</a></p>
+<h5 id="Mockito-mocks-可以通过classloaders序列化-反序列化-1-10-0"><a href="#Mockito-mocks-可以通过classloaders序列化-反序列化-1-10-0" class="headerlink" title="Mockito mocks 可以通过classloaders序列化/反序列化(1.10.0)"></a>Mockito mocks 可以通过classloaders序列化/反序列化(1.10.0)</h5><p>Mockito 通过 classloader 引入序列化。和其他形式的序列化一样，所有 mock 层的对象都要被序列化， 包括 answers。因为序列化模式需要大量的工作，所以这是一个可选择设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/ 常规的 serialization</span><br><span class="line">mock(Book.class, withSettings().serializable());</span><br><span class="line"></span><br><span class="line">// 通过 classloaders 序列化</span><br><span class="line">mock(Book.class, withSettings().serializable(ACROSS_CLASSLOADERS));</span><br></pre></td></tr></table></figure>
+
+<p>更多信息请查看<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockSettings.html#serializable-org.mockito.mock.SerializableMode-" target="_blank" rel="noopener">MockSettings.serializable(SerializableMode)</a></p>
+<h5 id="Deep-stubs-更好的泛型支持-1-10-0"><a href="#Deep-stubs-更好的泛型支持-1-10-0" class="headerlink" title="Deep stubs 更好的泛型支持(1.10.0)"></a>Deep stubs 更好的泛型支持(1.10.0)</h5><p>Deep stubbing 现在可以更好的查找类的泛型信息。这就意味着像这样的类 不必去 mock 它的行为就可以使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Lines extends List&lt;Line&gt; &#123;</span><br><span class="line">     // ...</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> lines = mock(Lines.class, RETURNS_DEEP_STUBS);</span><br><span class="line"></span><br><span class="line"> // Now Mockito understand this is not an Object but a Line</span><br><span class="line"> Line line = lines.iterator().next();</span><br></pre></td></tr></table></figure>
+
+<p>请注意，大多数情况下 mock 返回一个 mock 对象是错误的。</p>
+<h5 id="Mockito-JUnit-rule-110-17"><a href="#Mockito-JUnit-rule-110-17" class="headerlink" title="Mockito JUnit rule(110.17)"></a>Mockito JUnit rule(110.17)</h5><p>Mockito 现在提供一个 JUnit rule。目前为止，有两种方法可以初始化 fields ，使用 Mockito 提供的注解比如 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mock.html" target="_blank" rel="noopener">@Mock</a>, <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Spy.html" target="_blank" rel="noopener">@Spy</a>, <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/InjectMocks.html" target="_blank" rel="noopener">@InjectMocks</a> 等等。</p>
+<ul>
+<li>用 @RunWith(<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoJUnitRunner.html" target="_blank" rel="noopener">@MockitoJUnitRunner.class</a>) 标注 JUnit 测试类</li>
+<li>在 @Before 之前调用 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/MockitoAnnotations.html#initMocks-java.lang.Object-" target="_blank" rel="noopener">MockitoAnnotations.initMocks(Object)</a><br>现在你可以选择使用一个 rule:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@RunWith(YetAnotherRunner.class)</span><br><span class="line">public class TheTest &#123;</span><br><span class="line">    @Rule public MockitoRule mockito = MockitoJUnit.rule();</span><br><span class="line">    // ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>更多信息到这里查看 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/junit/MockitoJUnit.html#rule--" target="_blank" rel="noopener">MockitoJUnit.rule()</a>.</p>
+<h5 id="开启和关闭-plugins（1-10-15）"><a href="#开启和关闭-plugins（1-10-15）" class="headerlink" title="开启和关闭 plugins（1.10.15）"></a>开启和关闭 plugins（1.10.15）</h5><p>这是一个测试特性，可以控制一个 mockito-plugin 开启或者关闭。详情请查看 <a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/plugins/PluginSwitch.html" target="_blank" rel="noopener">PluginSwitch</a></p>
+<h5 id="自定义验证失败信息（2-1-0）"><a href="#自定义验证失败信息（2-1-0）" class="headerlink" title="自定义验证失败信息（2.1.0）"></a>自定义验证失败信息（2.1.0）</h5><p>允许声明一个在验证失败时输出的自定义消息 示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// will print a custom message on verification failure</span><br><span class="line">verify(mock, description(&quot;This will print on failure&quot;)).someMethod();</span><br><span class="line"></span><br><span class="line">// will work with any verification mode</span><br><span class="line">verify(mock, times(2).description(&quot;someMethod should be called twice&quot;)).someMethod();</span><br></pre></td></tr></table></figure>
+
+<h5 id="Java8-Lambda-Matcher支持（2-1-0-）"><a href="#Java8-Lambda-Matcher支持（2-1-0-）" class="headerlink" title="Java8 Lambda Matcher支持（2.1.0+）"></a>Java8 Lambda Matcher支持（2.1.0+）</h5><p>您可以使用带有<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/ArgumentMatcher.html" target="_blank" rel="noopener">ArgumentMatcher</a>的Java 8 lambda表达式来减少对<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/ArgumentCaptor.html" target="_blank" rel="noopener">ArgumentCaptor</a>的依赖。如果您需要验证对mock上的函数调用的输入是正确的，那么您通常会使用ArgumentCaptor查找所使用的操作数，然后对它们进行后续断言。虽然对于复杂的示例，这可能是有用的，但它也是冗长的。<br>编写一个lambda来表示匹配是很容易的。与argThat一起使用时，函数的参数将作为强类型对象传递给argumentmatmatcher，因此可以使用它做任何事情。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">// verify a list only had strings of a certain length added to it</span><br><span class="line">// note - this will only compile under Java 8</span><br><span class="line">verify(list, times(2)).add(argThat(string -&gt; string.length() &lt; 5));</span><br><span class="line"></span><br><span class="line">// Java 7 equivalent - not as neat</span><br><span class="line">verify(list, times(2)).add(argThat(new ArgumentMatcher()&#123;</span><br><span class="line">    public boolean matches(String arg) &#123;</span><br><span class="line">        return arg.length() &lt; 5;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">// more complex Java 8 example - where you can specify complex verification behaviour functionally</span><br><span class="line">verify(target, times(1)).receiveComplexObject(argThat(obj -&gt; obj.getSubObject().get(0).equals(&quot;expected&quot;)));</span><br><span class="line"></span><br><span class="line">// this can also be used when defining the behaviour of a mock under different inputs</span><br><span class="line">// in this case if the input list was fewer than 3 items the mock returns null</span><br><span class="line">when(mock.someMethod(argThat(list -&gt; list.size()&lt;3))).willReturn(null);</span><br></pre></td></tr></table></figure>
+
+<h5 id="Java-8-Custom-Answer-Support"><a href="#Java-8-Custom-Answer-Support" class="headerlink" title="Java 8 Custom Answer Support"></a>Java 8 Custom Answer Support</h5><p>由于Answer接口只有一个方法，因此在Java 8中使用lambda表达式来实现它已经成为可能。您越是需要使用方法调用的参数，就越需要从InvocationOnMock中指定更多的参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// answer by returning 12 every time</span><br><span class="line">doAnswer(invocation -&gt; 12).when(mock).doSomething();</span><br><span class="line"></span><br><span class="line">// answer by using one of the parameters - converting into the right</span><br><span class="line">// type as your go - in this case, returning the length of the second string parameter</span><br><span class="line">// as the answer. This gets long-winded quickly, with casting of parameters.</span><br><span class="line">doAnswer(invocation -&gt; ((String)invocation.getArgument(1)).length())</span><br><span class="line">    .when(mock).doSomething(anyString(), anyString(), anyString());</span><br></pre></td></tr></table></figure>
+
+<p>为了方便起见，可以将使用方法调用参数的自定义答案/操作编写为Java 8 lambda表达式。即使在Java 7中，基于类型化接口的这些自定义答案也可以减少样板。特别是，这种方法将使测试使用回调函数更容易。这些方法answer和answerVoid 可用于创建应答。他们依靠相关的答案接口org.mockito.stubbing来支持最多5个参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">// Example interface to be mocked has a function like:</span><br><span class="line">void execute(String operand, Callback callback);</span><br><span class="line"></span><br><span class="line">// the example callback has a function and the class under test</span><br><span class="line">// will depend on the callback being invoked</span><br><span class="line">void receive(String item);</span><br><span class="line"></span><br><span class="line">// Java 8 - style 1</span><br><span class="line">doAnswer(AdditionalAnswers.answerVoid((operand, callback) -&gt; callback.receive(&quot;dummy&quot;))</span><br><span class="line">    .when(mock).execute(anyString(), any(Callback.class));</span><br><span class="line"></span><br><span class="line">// Java 8 - style 2 - assuming static import of AdditionalAnswers</span><br><span class="line">doAnswer(answerVoid((String operand, Callback callback) -&gt; callback.receive(&quot;dummy&quot;))</span><br><span class="line">    .when(mock).execute(anyString(), any(Callback.class));</span><br><span class="line"></span><br><span class="line">// Java 8 - style 3 - where mocking function to is a static member of test class</span><br><span class="line">private static void dummyCallbackImpl(String operation, Callback callback) &#123;</span><br><span class="line">    callback.receive(&quot;dummy&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">doAnswer(answerVoid(TestClass::dummyCallbackImpl)</span><br><span class="line">    .when(mock).execute(anyString(), any(Callback.class));</span><br><span class="line"></span><br><span class="line">// Java 7</span><br><span class="line">doAnswer(answerVoid(new VoidAnswer2() &#123;</span><br><span class="line">    public void answer(String operation, Callback callback) &#123;</span><br><span class="line">        callback.receive(&quot;dummy&quot;);</span><br><span class="line">    &#125;&#125;)).when(mock).execute(anyString(), any(Callback.class));</span><br><span class="line"></span><br><span class="line">// returning a value is possible with the answer() function</span><br><span class="line">// and the non-void version of the functional interfaces</span><br><span class="line">// so if the mock interface had a method like</span><br><span class="line">boolean isSameString(String input1, String input2);</span><br><span class="line"></span><br><span class="line">// this could be mocked</span><br><span class="line">// Java 8</span><br><span class="line">doAnswer(AdditionalAnswers.answer((input1, input2) -&gt; input1.equals(input2))))</span><br><span class="line">    .when(mock).execute(anyString(), anyString());</span><br><span class="line"></span><br><span class="line">// Java 7</span><br><span class="line">doAnswer(answer(new Answer2() &#123;</span><br><span class="line">    public String answer(String input1, String input2) &#123;</span><br><span class="line">        return input1 + input2;</span><br><span class="line">    &#125;&#125;)).when(mock).execute(anyString(), anyString());</span><br></pre></td></tr></table></figure>
+
+<h5 id="元数据和通用类型保留-2-1-0"><a href="#元数据和通用类型保留-2-1-0" class="headerlink" title="元数据和通用类型保留(2.1.0+)"></a>元数据和通用类型保留(2.1.0+)</h5><p>Mockito现在将注释保存在模拟方法和类型以及通用元数据上。以前，模拟类型不保存类型上的注释，除非它们是显式继承的，并且永远不会保留方法上的注释。因此，下列条件现在成立:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@MyAnnotation</span><br><span class="line"> class Foo &#123;</span><br><span class="line">   List&lt;String&gt; bar() &#123; ... &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> Class&lt;?&gt; mockType = mock(Foo.class).getClass();</span><br><span class="line"> assert mockType.isAnnotationPresent(MyAnnotation.class);</span><br><span class="line"> assert mockType.getDeclaredMethod(&quot;bar&quot;).getGenericReturnType() instanceof ParameterizedType;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Mocking-final-types-enums-and-final-methods"><a href="#Mocking-final-types-enums-and-final-methods" class="headerlink" title="Mocking final types, enums and final methods"></a>Mocking final types, enums and final methods</h5><p>Mockito现在提供了一个<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Incubating.html" target="_blank" rel="noopener">Incubating</a>可选的支持来模拟最终的类和方法。这是一个奇妙的改进，展示了Mockito对改进测试体验的永恒追求。我们的追求是Mockito在最终的类和方法中“正常工作”。以前他们被认为是不可以mocking的，防止用户mocking。我们已经开始讨论如何在默认情况下启用此功能。目前，当我们等待来自社区的更多反馈时，该功能仍然是可选的。</p>
+<p>这种alternative mock maker使用Java Instrumentation API和子类的组合，而不是创建一个新类来表示模拟。这样，就可以模拟最终的类型和方法。</p>
+<p>这个mock maker在默认情况下是关闭的，因为它基于完全不同的mock机制，需要社区提供更多的反馈。它可以被mockito扩展机制显式激活，只需在类路径中创建一个文件/mockito-extensions/org.mockito.plugins。包含值mock-maker-inline的MockMaker。</p>
+<p>为了方便起见，Mockito团队提供了一个工件，在其中预先配置了mock maker。不要使用mockito-core构件，在项目中包含mockito-inline构件。注意，一旦对最终类和方法进行mock处理并集成到默认的mock生成器中，这个工件很可能会被停止。  </p>
+<p>关于这个mock maker的一些值得注意的注意事项:</p>
+<ul>
+<li>mock最终类型和枚举与模拟设置不兼容，如：<ul>
+<li>明确的序列化支持 withSettings().serializable()</li>
+<li>额外的接口 withSettings().extraInterfaces()</li>
+</ul>
+</li>
+<li>有些方法不能被mock<ul>
+<li>Package-visible java 方法</li>
+<li>本地方法</li>
+</ul>
+</li>
+<li>这个模拟器是围绕Java代理运行时附件设计的; 这需要一个兼容的JVM，它是JDK（或Java 9 VM）的一部分。当在Java 9之前的非JDK虚拟机上运行时，可以 在启动JVM时使用参数手动添加Byte Buddy Java代理jar-javaagent。</li>
+</ul>
+<p>更多细节请阅读javadoc org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker</p>
+<h5 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h5><ul>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#strict_mockito" target="_blank" rel="noopener">(<em>new</em>) Improved productivity and cleaner tests with “stricter” Mockito</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#framework_integrations_api" target="_blank" rel="noopener">Advanced public API for framework integrations (Since 2.10.+)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#verifiation_started_listener" target="_blank" rel="noopener">New API for integrations: listening on verification start events (Since 2.11.+)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#mockito_session_testing_frameworks" target="_blank" rel="noopener">New API for integrations: MockitoSession is usable by testing frameworks (Since 2.15.+)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#mockito_instantiator_provider_deprecation" target="_blank" rel="noopener">Deprecated org.mockito.plugins.InstantiatorProvider as it was leaking internal API. it was replaced by org.mockito.plugins.InstantiatorProvider2 (Since 2.15.4)</a></li>
+<li><a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html#junit5_mockito" target="_blank" rel="noopener">New JUnit Jupiter (JUnit5+) extension</a></li>
+</ul>
+<p><strong>下面还有很多关于 字段摘要、字段详情、方法摘要、方法详情等的详细描述。自己去<a href="https://static.javadoc.io/org.mockito/mockito-core/2.19.0/org/mockito/Mockito.html" target="_blank" rel="noopener">官方文档</a>看吧</strong></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/06/26/单元测试（二）：Mockito的使用/">单元测试（二）：Mockito的使用</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">竹影</a></p>
+        <p><span>发布时间:</span>2018-06-26, 14:07:36</p>
+        <p><span>最后更新:</span>2018-07-03, 10:44:13</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/06/26/单元测试（二）：Mockito的使用/" title="单元测试（二）：Mockito的使用">http://liyuncang.club/2018/06/26/单元测试（二）：Mockito的使用/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://liyuncang.club/2018/06/26/单元测试（二）：Mockito的使用/　　作者: 竹影" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2018/06/28/单元测试（三）：PowerMock的使用/">
+                    单元测试（三）：PowerMock的使用
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/06/14/单元测试（一）-：JUnit框架的使用/">
+                    单元测试（一）-：JUnit4框架的使用
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Mock"><span class="toc-number">1.</span> <span class="toc-text">什么是Mock</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Android中引用"><span class="toc-number">2.</span> <span class="toc-text">Android中引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#常用方法"><span class="toc-number">3.</span> <span class="toc-text">常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Mock方式"><span class="toc-number">3.1.</span> <span class="toc-text">Mock方式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#常用打桩方法-Stub"><span class="toc-number">3.2.</span> <span class="toc-text">常用打桩方法 Stub</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#常用验证方法"><span class="toc-number">3.3.</span> <span class="toc-text">常用验证方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#常用参数匹配器"><span class="toc-number">3.4.</span> <span class="toc-text">常用参数匹配器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#其他方法"><span class="toc-number">3.5.</span> <span class="toc-text">其他方法</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#重置mocks对象-reset"><span class="toc-number">3.5.1.</span> <span class="toc-text">重置mocks对象 reset</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#监控真实对象spy"><span class="toc-number">3.5.2.</span> <span class="toc-text">监控真实对象spy</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#验证方法执行顺序"><span class="toc-number">3.5.3.</span> <span class="toc-text">验证方法执行顺序</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#基本使用"><span class="toc-number">4.</span> <span class="toc-text">基本使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#验证某些行为-verify"><span class="toc-number">4.1.</span> <span class="toc-text">验证某些行为 verify</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#如何做一些测试桩-Stub"><span class="toc-number">4.2.</span> <span class="toc-text">如何做一些测试桩 (Stub)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#参数匹配器-matchers"><span class="toc-number">4.3.</span> <span class="toc-text">参数匹配器 (matchers)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#验证函数的确切、最少、从未调用次数"><span class="toc-number">4.4.</span> <span class="toc-text">验证函数的确切、最少、从未调用次数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#为返回值为void的函数通过Stub抛出异常"><span class="toc-number">4.5.</span> <span class="toc-text">为返回值为void的函数通过Stub抛出异常</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#验证方法执行顺序-1"><span class="toc-number">4.6.</span> <span class="toc-text">验证方法执行顺序</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#确保交互（interaction）操作不会执行在mock对象上"><span class="toc-number">4.7.</span> <span class="toc-text">确保交互（interaction）操作不会执行在mock对象上</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#查找冗余的调用"><span class="toc-number">4.8.</span> <span class="toc-text">查找冗余的调用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#简化mock对象的创建"><span class="toc-number">4.9.</span> <span class="toc-text">简化mock对象的创建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#为连续的调用做测试桩（stub）"><span class="toc-number">4.10.</span> <span class="toc-text">为连续的调用做测试桩（stub）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#为回调做测试桩"><span class="toc-number">4.11.</span> <span class="toc-text">为回调做测试桩</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#doReturn-、doThrow-、doAnswer-、doNothing-、doCallRealMethod-系列方法的运用"><span class="toc-number">4.12.</span> <span class="toc-text">doReturn()、doThrow()、doAnswer()、doNothing()、doCallRealMethod()系列方法的运用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#监控真实对象"><span class="toc-number">4.13.</span> <span class="toc-text">监控真实对象</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#修改没有测试桩的调用的默认返回值-1-7"><span class="toc-number">4.14.</span> <span class="toc-text">修改没有测试桩的调用的默认返回值 ( 1.7+ )</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#为下一步的断言捕获参数-1-8"><span class="toc-number">4.15.</span> <span class="toc-text">为下一步的断言捕获参数 (1.8+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#真实的局部mocks-1-8"><span class="toc-number">4.16.</span> <span class="toc-text">真实的局部mocks(1.8+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#重置mock对象-1-8"><span class="toc-number">4.17.</span> <span class="toc-text">重置mock对象(1.8+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#故障排查与验证框架的使用-1-8"><span class="toc-number">4.18.</span> <span class="toc-text">故障排查与验证框架的使用 (1.8+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#行为驱动开发的别名（1-8-）"><span class="toc-number">4.19.</span> <span class="toc-text">行为驱动开发的别名（1.8+）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#序列化mock对象"><span class="toc-number">4.20.</span> <span class="toc-text">序列化mock对象</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#新的注解-Captor-Spy-InjectMocks-1-8-3"><span class="toc-number">4.21.</span> <span class="toc-text">新的注解:@Captor,@Spy,@ InjectMocks (1.8.3+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#验证超时"><span class="toc-number">4.22.</span> <span class="toc-text">验证超时</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#自动初始化-Spies-InjectMocks注解的字段以及构造函数注入-1-9-0"><span class="toc-number">4.23.</span> <span class="toc-text">自动初始化@Spies, @InjectMocks注解的字段以及构造函数注入(1.9.0+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#单行测试桩-1-9-0"><span class="toc-number">4.24.</span> <span class="toc-text">单行测试桩(1.9.0+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#验证被忽略的测试桩-1-9-0"><span class="toc-number">4.25.</span> <span class="toc-text">验证被忽略的测试桩 (1.9.0+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Mocking-详情（改善2-2-x）"><span class="toc-number">4.26.</span> <span class="toc-text">Mocking 详情（改善2.2.x）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#委托调用真实实例-1-9-5"><span class="toc-number">4.27.</span> <span class="toc-text">委托调用真实实例(1.9.5+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MockMaker-API-1-9-5"><span class="toc-number">4.28.</span> <span class="toc-text">MockMaker API(1.9.5+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#BDD风格的验证-1-10-0"><span class="toc-number">4.29.</span> <span class="toc-text">BDD风格的验证(1.10.0+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spying或mocking抽象类-1-12-0"><span class="toc-number">4.30.</span> <span class="toc-text">Spying或mocking抽象类(1.12.0)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Mockito-mocks-可以通过classloaders序列化-反序列化-1-10-0"><span class="toc-number">4.31.</span> <span class="toc-text">Mockito mocks 可以通过classloaders序列化/反序列化(1.10.0)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Deep-stubs-更好的泛型支持-1-10-0"><span class="toc-number">4.32.</span> <span class="toc-text">Deep stubs 更好的泛型支持(1.10.0)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Mockito-JUnit-rule-110-17"><span class="toc-number">4.33.</span> <span class="toc-text">Mockito JUnit rule(110.17)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#开启和关闭-plugins（1-10-15）"><span class="toc-number">4.34.</span> <span class="toc-text">开启和关闭 plugins（1.10.15）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#自定义验证失败信息（2-1-0）"><span class="toc-number">4.35.</span> <span class="toc-text">自定义验证失败信息（2.1.0）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Java8-Lambda-Matcher支持（2-1-0-）"><span class="toc-number">4.36.</span> <span class="toc-text">Java8 Lambda Matcher支持（2.1.0+）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Java-8-Custom-Answer-Support"><span class="toc-number">4.37.</span> <span class="toc-text">Java 8 Custom Answer Support</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#元数据和通用类型保留-2-1-0"><span class="toc-number">4.38.</span> <span class="toc-text">元数据和通用类型保留(2.1.0+)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Mocking-final-types-enums-and-final-methods"><span class="toc-number">4.39.</span> <span class="toc-text">Mocking final types, enums and final methods</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#其他"><span class="toc-number">4.40.</span> <span class="toc-text">其他</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"单元测试（二）：Mockito的使用　| 我的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/06/28/单元测试（三）：PowerMock的使用/" title="上一篇: 单元测试（三）：PowerMock的使用">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/06/14/单元测试（一）-：JUnit框架的使用/" title="下一篇: 单元测试（一）-：JUnit4框架的使用">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/09/18/GestureDetector/">GestureDetector</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/14/Rxjava2-操作符/">Rxjava2 操作符</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/12/Rxjava-源码分析/">Rxjava 源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/12/Rxjava/">Rxjava2.x的基本概念和使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/EventBus3-0源码解析/">EventBus3.0源码解析</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/13/EventBus框架/">EventBus框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/03/单元测试（四）：Robolectric/">单元测试（四）：Robolectric</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/28/单元测试（三）：PowerMock的使用/">单元测试（三）：PowerMock的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/26/单元测试（二）：Mockito的使用/">单元测试（二）：Mockito的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/14/单元测试（一）-：JUnit框架的使用/">单元测试（一）-：JUnit4框架的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/14/FlowLayout/">FlowLayout</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/13/Androdi-build-gradle文件/"> Androdi build.gradle文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/13/AndroidStudio-添加C和C-代码/">AndroidStudio 添加C和C++代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/11/Property-Animation-属性动画高级用法/">Property Animation 属性动画高级用法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/11/Animation-基本使用/">Animation 基本使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/08/java-基本算法/">java 常用排序算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/FileProvider/">FileProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/夜间模式/">夜间模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/Android-跑马灯效果/">Android 跑马灯效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/Android子线程不能更新UI的原因/">Android子线程不能更新UI的原因</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android-四大组件/">Android 四大组件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android学习API指南/">Android学习API指南</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/Android的四层体系架构/">Android的四层体系架构</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/Http状态码/">Http状态码</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/贝塞尔曲线/">贝塞尔曲线</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/05/git命令/">git命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Git/">Git 基本使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Hexo-常用命令/">Hexo</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/Hexo-Github-博客/">Hexo+Github 搭建博客</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/30/Markdown-基本语法/">Markdown 基本语法</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2019 竹影
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
